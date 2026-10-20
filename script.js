@@ -117,6 +117,24 @@ function renderLatest(){
   $("#last2").textContent=d?.last2||"--";
   $("#lastSync").textContent=state.lastSync?`อัปเดตล่าสุด ${thDateTime(state.lastSync)}`:"อัปเดตข้อมูลอัตโนมัติ";
 }
+
+function normalizeSixCandidates(value){
+  if(Array.isArray(value)){
+    return value
+      .map(x=>String(x??"").replace(/\D/g,"").padStart(6,"0").slice(-6))
+      .filter(x=>/^\d{6}$/.test(x));
+  }
+  if(typeof value==="string"){
+    try{
+      const parsed=JSON.parse(value);
+      if(Array.isArray(parsed))return normalizeSixCandidates(parsed);
+    }catch(_){}
+    return value.split(",")
+      .map(x=>String(x).trim())
+      .filter(x=>/^\d{6}$/.test(x));
+  }
+  return [];
+}
 function renderPrediction(){
   const p=state.currentPrediction||makeLocalPreview();
   if(p){
@@ -132,9 +150,10 @@ function renderPrediction(){
   const p6=state.currentPrediction6||makeLocalPreview6();
   if(p6){
     $("#excludedFirstPrize").textContent=p6.excludedFirstPrize||state.results[0]?.firstPrize||"—";
-    $("#candidate6List").innerHTML=(p6.candidates||[]).map((n,i)=>
+    const sixCandidates=normalizeSixCandidates(p6.candidates);
+    $("#candidate6List").innerHTML=sixCandidates.map((n,i)=>
       `<div class="candidate6"><strong>${esc(n)}</strong><span>score ${Number((p6.scores||[])[i]||0).toFixed(1)}</span></div>`
-    ).join("");
+    ).join("") || `<div class="candidate6"><strong>กำลังสร้างใหม่</strong><span>รอ Sync รอบถัดไป</span></div>`;
   }else{
     $("#candidate6List").innerHTML="";
     $("#excludedFirstPrize").textContent="—";
@@ -145,7 +164,7 @@ function renderAudit(){
   const closed=state.predictions.filter(x=>x.status==="CLOSED").sort((a,b)=>String(b.actualDrawDate).localeCompare(String(a.actualDrawDate))),p=closed[0],badge=$("#auditBadge"),repeat=$("#repeatExplanation");repeat.hidden=true;
   if(!p){$("#auditCandidates").textContent="—";$("#auditActual").textContent="—";$("#auditResult").textContent="ยังไม่มีงวดให้ตรวจ";$("#auditCreated").textContent="—";badge.textContent="รอผล";badge.className="audit-badge pending"}
   else{$("#auditCandidates").textContent=(p.candidates||[]).join(" · ");$("#auditActual").textContent=p.actualLast2||"—";$("#auditCreated").textContent=thDateTime(p.createdAt);if(p.hit){$("#auditResult").textContent=`ตรง ✓ อันดับ ${p.hitRank}`;badge.textContent="ตรง";badge.className="audit-badge hit"}else{$("#auditResult").textContent="ไม่ตรง";badge.textContent="ไม่ตรง";badge.className="audit-badge miss"}if(p.actualRepeatedPrevious)repeat.hidden=false}
-  $("#auditHistory").innerHTML=closed.slice(0,12).map(x=>`<tr><td>${thDate(x.actualDrawDate)}</td><td>${esc((x.candidates||[]).join(" · "))}</td><td><b class="two-no">${esc(x.actualLast2||"—")}</b></td><td>${x.hit?`ตรง #${x.hitRank}`:"ไม่ตรง"}</td><td>${x.actualRepeatedPrevious?"ออกซ้ำงวดก่อน (ถูก exclude)":"—"}</td></tr>`).join("")||`<tr><td colspan="5">ยังไม่มีประวัติ</td></tr>`;
+  $("#auditHistory").innerHTML=closed.slice(0,12).map(x=>`<tr><td>${thDate(x.actualDrawDate)}</td><td>${esc(normalizeSixCandidates(x.candidates).join(" · "))}</td><td><b class="two-no">${esc(x.actualLast2||"—")}</b></td><td>${x.hit?`ตรง #${x.hitRank}`:"ไม่ตรง"}</td><td>${x.actualRepeatedPrevious?"ออกซ้ำงวดก่อน (ถูก exclude)":"—"}</td></tr>`).join("")||`<tr><td colspan="5">ยังไม่มีประวัติ</td></tr>`;
 }
 
 function renderAudit6(){
@@ -162,7 +181,7 @@ function renderAudit6(){
     badge.textContent="รอผล";
     badge.className="audit-badge pending";
   }else{
-    $("#audit6Candidates").textContent=(p.candidates||[]).join(" · ");
+    $("#audit6Candidates").textContent=normalizeSixCandidates(p.candidates).join(" · ")||"—";
     $("#audit6Actual").textContent=p.actualFirstPrize||"—";
     $("#audit6Created").textContent=thDateTime(p.createdAt);
 
@@ -189,7 +208,7 @@ function renderAudit6(){
       : "ไม่ตรงรางวัล";
     return `<tr>
       <td>${thDate(x.actualDrawDate)}</td>
-      <td>${esc((x.candidates||[]).join(" · "))}</td>
+      <td>${esc(normalizeSixCandidates(x.candidates).join(" · "))}</td>
       <td><b class="main-no">${esc(x.actualFirstPrize||"—")}</b></td>
       <td>${result}</td>
     </tr>`;
