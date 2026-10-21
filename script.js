@@ -63,13 +63,93 @@ async function load(initial=false){
 }
 function dataRange(){return state.range==="all"?state.results:state.results.slice(0,Math.min(Number(state.range),state.results.length))}
 function makeLocalPreview(){
-  const rows=state.results.slice(0,50); if(!rows.length)return null;
-  const latest=rows[0].last2,tens=Array(10).fill(1),ones=Array(10).fill(1),pairs=Array(100).fill(.25),n=rows.length;
-  rows.forEach((d,i)=>{if(!/^\d{2}$/.test(d.last2))return;const w=1+((n-i)/n)*.5;tens[+d.last2[0]]+=w;ones[+d.last2[1]]+=w;pairs[+d.last2]+=w});
-  const maxT=Math.max(...tens),maxO=Math.max(...ones),maxP=Math.max(...pairs),all=[];
-  for(let i=0;i<100;i++){const num=String(i).padStart(2,"0");if(num===latest)continue;const score=(.45*tens[+num[0]]/maxT+.45*ones[+num[1]]/maxO+.10*pairs[i]/maxP)*100;all.push({number:num,score:+score.toFixed(1)})}
-  all.sort((a,b)=>b.score-a.score||a.number.localeCompare(b.number));const top=all.slice(0,5);
-  return {basedOnDrawDate:rows[0].drawDate,excludedLast2:latest,candidates:top.map(x=>x.number),scores:top.map(x=>x.score),status:"PREVIEW"};
+  const rows=state.results.slice(0,50);
+  if(!rows.length)return null;
+
+  const latest=rows[0].last2;
+  const tens=Array(10).fill(1);
+  const ones=Array(10).fill(1);
+  const pairs=Array(100).fill(.25);
+  const n=rows.length;
+
+  rows.forEach((d,i)=>{
+    if(!/^\d{2}$/.test(d.last2))return;
+    const w=1+((n-i)/n)*.5;
+    tens[+d.last2[0]]+=w;
+    ones[+d.last2[1]]+=w;
+    pairs[+d.last2]+=w;
+  });
+
+  const maxT=Math.max(...tens),maxO=Math.max(...ones),maxP=Math.max(...pairs);
+  const ranked=[];
+
+  for(let i=0;i<100;i++){
+    const number=String(i).padStart(2,"0");
+    if(number===latest)continue;
+
+    const base=(
+      .40*tens[+number[0]]/maxT+
+      .40*ones[+number[1]]/maxO+
+      .20*pairs[i]/maxP
+    )*100;
+
+    ranked.push({number,base});
+  }
+
+  ranked.sort((a,b)=>b.base-a.base||a.number.localeCompare(b.number));
+
+  const bestBase=ranked[0]?.base||1;
+  let pool=ranked.filter(x=>x.base>=bestBase*.72).slice(0,70);
+  if(pool.length<25)pool=ranked.slice(0,70);
+
+  const selected=[];
+
+  const diversity=(cand)=>{
+    if(!selected.length)return 1;
+    const uniqueT=selected.every(s=>s.number[0]!==cand.number[0])?1:0;
+    const uniqueO=selected.every(s=>s.number[1]!==cand.number[1])?1:0;
+    const minH=Math.min(...selected.map(s=>
+      (s.number[0]!==cand.number[0]?1:0)+(s.number[1]!==cand.number[1]?1:0)
+    ));
+    return .45*uniqueT+.45*uniqueO+.10*(minH/2);
+  };
+
+  const choose=(mode)=>{
+    let best=null;
+    pool.forEach(c=>{
+      if(selected.some(s=>s.number===c.number))return;
+      const sameT=selected.some(s=>s.number[0]===c.number[0]);
+      const sameO=selected.some(s=>s.number[1]===c.number[1]);
+
+      if(mode===0&&selected.length&&(sameT||sameO))return;
+      if(mode===1&&selected.length&&sameT&&sameO)return;
+
+      const objective=.80*(c.base/bestBase)+.20*diversity(c);
+      if(!best||objective>best.objective||
+         (objective===best.objective&&c.base>best.base)||
+         (objective===best.objective&&c.base===best.base&&c.number<best.number)){
+        best={...c,objective};
+      }
+    });
+    return best;
+  };
+
+  while(selected.length<5){
+    let next=choose(0);
+    if(!next)next=choose(1);
+    if(!next)next=choose(2);
+    if(!next)break;
+    selected.push(next);
+  }
+
+  const topObjective=selected[0]?.objective||1;
+  return {
+    basedOnDrawDate:rows[0].drawDate,
+    excludedLast2:latest,
+    candidates:selected.map(x=>x.number),
+    scores:selected.map(x=>+(x.objective/topObjective*100).toFixed(1)),
+    status:"PREVIEW"
+  };
 }
 
 function makeLocalPreview6(){
@@ -189,7 +269,7 @@ function normalizeSixCandidates(value){
   return [];
 }
 function renderPrediction(){
-  const p=state.currentPrediction||makeLocalPreview();
+  const p=state.currentPrediction||(!CFG.DATA_URL?makeLocalPreview():null);
   if(p){
     $("#predictionSub").textContent=`อิงข้อมูลถึงงวด ${thDate(p.basedOnDrawDate)}`;
     $("#excludedLast2").textContent=p.excludedLast2||state.results[0]?.last2||"—";
@@ -197,10 +277,11 @@ function renderPrediction(){
       `<div class="candidate"><strong>${esc(n)}</strong><span>score ${Number((p.scores||[])[i]||0).toFixed(1)}</span></div>`
     ).join("");
   }else{
-    $("#candidateList").innerHTML="";
+    $("#candidateList").innerHTML=`<div class="candidate"><strong>—</strong><span>กำลังสร้าง Candidate ชุดใหม่</span></div>`;
+    $("#excludedLast2").textContent=state.results[0]?.last2||"—";
   }
 
-  const p6=state.currentPrediction6||makeLocalPreview6();
+  const p6=state.currentPrediction6||(!CFG.DATA_URL?makeLocalPreview6():null);
   if(p6){
     $("#excludedFirstPrize").textContent=p6.excludedFirstPrize||state.results[0]?.firstPrize||"—";
     const sixCandidates=normalizeSixCandidates(p6.candidates);
@@ -215,8 +296,8 @@ function renderPrediction(){
       </div>`;
     }).join("") || `<div class="candidate6"><strong>กำลังสร้างใหม่</strong><span>รอ Sync รอบถัดไป</span></div>`;
   }else{
-    $("#candidate6List").innerHTML="";
-    $("#excludedFirstPrize").textContent="—";
+    $("#candidate6List").innerHTML=`<div class="candidate6"><div class="candidate6-main"><strong>กำลังสร้าง Candidate ชุดใหม่</strong><small>รอ Sync Algorithm v2</small></div><span>—</span></div>`;
+    $("#excludedFirstPrize").textContent=state.results[0]?.firstPrize||"—";
   }
 }
 

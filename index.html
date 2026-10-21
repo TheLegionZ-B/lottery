@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="สถิติผลสลากย้อนหลัง ตรวจรางวัล และบันทึกการคาดการณ์แบบตรวจสอบย้อนหลังได้">
   <title>Lottery Insight</title>
-  <link rel="stylesheet" href="style.css?v=4.8">
+  <link rel="stylesheet" href="style.css?v=5.0">
 </head>
 <body>
   <div id="pageLoader" class="page-loader" aria-live="polite">
@@ -112,7 +112,7 @@
         <div class="prediction-block">
           <div class="prediction-block-head">
             <strong>เลขท้าย 2 ตัว</strong>
-            <small>Top 5 จาก Stat score</small>
+            <small>Coverage + Diversity · กระจายหลักสิบ/หลักหน่วย</small>
           </div>
           <div id="candidateList" class="candidate-list"></div>
           <div class="exclude-note">
@@ -124,11 +124,12 @@
         <div class="prediction-block six-block">
           <div class="prediction-block-head">
             <strong>เลขสลาก 6 หลัก</strong>
-            <small>ระบบจะรอตรวจกับงวดถัดไปอัตโนมัติ</small>
+            <small>Coverage + Diversity · กระจาย Candidate ให้ต่างกัน</small>
           </div>
           <div id="candidate6List" class="candidate6-list"></div>
           <div class="candidate6-check-note">
-            Candidate 6 หลักจะถูกตรวจทั้งเลขเต็ม 6 หลัก, เลขหน้า 3 ตัว, เลขท้าย 3 ตัว และเลขท้าย 2 ตัว เมื่อผลของงวดถัดไปเข้าระบบ
+            <b>Diversity Guard</b> · Top 5 จะพยายามไม่ซ้ำเลขหน้า 3 ตัว, เลขท้าย 3 ตัว และเลขท้าย 2 ตัว
+            พร้อมกระจายให้ต่างกันหลายตำแหน่ง แล้วรอตรวจกับทุกรางวัลของงวดถัดไป
           </div>
           <div class="exclude-note">
             <span>ตัดรางวัลที่ 1 งวดล่าสุด</span>
@@ -141,16 +142,16 @@
           <div class="logic-two-col">
             <div>
               <b>2 ตัว</b>
-              <span>45% หลักสิบ + 45% หลักหน่วย + 10% เลขทั้งคู่</span>
+              <span>40% หลักสิบ + 40% หลักหน่วย + 20% เลขทั้งคู่ แล้ว Diversity re-ranking</span>
             </div>
             <div>
               <b>6 หลัก</b>
-              <span>ดูความถี่แยกตำแหน่งหลักที่ 1–6 แล้วจัดอันดับชุดที่คะแนนรวมสูง</span>
+              <span>ตำแหน่ง 6 หลัก + คู่เลขติดกัน + หน้า 3 + ท้าย 3 + ท้าย 2 แล้ว Diversity re-ranking</span>
             </div>
           </div>
           <p>
             ใช้ข้อมูลย้อนหลังสูงสุด 50 งวดตามที่มีในระบบ ให้งวดใหม่มีน้ำหนักมากกว่าเล็กน้อย
-            ไม่มี Random และ Snapshot ที่สร้างแล้วจะไม่เปลี่ยนระหว่างรอผล
+            ไม่มี Random และคัด Top 5 แบบกระจายความซ้ำ ทั้งเลข 2 ตัวและ 6 หลัก ก่อน Lock Snapshot รอผล
             <b>Stat score เป็นคะแนนจัดอันดับ ไม่ใช่ Probability</b>
           </p>
         </details>
@@ -347,7 +348,7 @@
   </div>
 
   <div id="toast" class="toast"></div>
-  <script src="config.js?v=4.8"></script>
-  <script src="script.js?v=4.8"></script>
+  <script src="config.js?v=5.0"></script>
+  <script src="script.js?v=5.0"></script>
 </body>
 </html>
