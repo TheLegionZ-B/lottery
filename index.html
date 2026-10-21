@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="สถิติผลสลากย้อนหลัง ตรวจรางวัล และบันทึกการคาดการณ์แบบตรวจสอบย้อนหลังได้">
   <title>Lottery Insight</title>
-  <link rel="stylesheet" href="style.css?v=4.7.1">
+  <link rel="stylesheet" href="style.css?v=4.8">
 </head>
 <body>
   <div id="pageLoader" class="page-loader" aria-live="polite">
@@ -57,6 +57,43 @@
           </div>
         </div>
 
+        <div class="latest-prize-panel">
+          <div class="latest-prize-title">
+            <strong>รางวัลเลขชุดย่อย</strong>
+            <small>งวดล่าสุด</small>
+          </div>
+
+          <div class="latest-prize-grid">
+            <div class="latest-prize-group">
+              <div class="latest-prize-label">
+                <span>เลขหน้า 3 ตัว</span>
+                <small id="front3Amount"></small>
+              </div>
+              <div id="front3Numbers" class="latest-prize-numbers">
+                <b>---</b><b>---</b>
+              </div>
+            </div>
+
+            <div class="latest-prize-group">
+              <div class="latest-prize-label">
+                <span>เลขท้าย 3 ตัว</span>
+                <small id="back3Amount"></small>
+              </div>
+              <div id="back3Numbers" class="latest-prize-numbers">
+                <b>---</b><b>---</b>
+              </div>
+            </div>
+          </div>
+
+          <div id="adjacentFirstGroup" class="latest-prize-adjacent" hidden>
+            <div class="latest-prize-label">
+              <span>ข้างเคียงรางวัลที่ 1</span>
+              <small id="adjacentFirstAmount"></small>
+            </div>
+            <div id="adjacentFirstNumbers" class="latest-adjacent-numbers"></div>
+          </div>
+        </div>
+
         <div class="result-footer">
           <span id="lastSync">ยังไม่พบข้อมูล</span>
           <a href="https://www.glo.or.th/" target="_blank" rel="noreferrer">ตรวจผลกับ GLO ↗</a>
@@ -90,6 +127,9 @@
             <small>ระบบจะรอตรวจกับงวดถัดไปอัตโนมัติ</small>
           </div>
           <div id="candidate6List" class="candidate6-list"></div>
+          <div class="candidate6-check-note">
+            Candidate 6 หลักจะถูกตรวจทั้งเลขเต็ม 6 หลัก, เลขหน้า 3 ตัว, เลขท้าย 3 ตัว และเลขท้าย 2 ตัว เมื่อผลของงวดถัดไปเข้าระบบ
+          </div>
           <div class="exclude-note">
             <span>ตัดรางวัลที่ 1 งวดล่าสุด</span>
             <strong id="excludedFirstPrize">—</strong>
@@ -307,7 +347,7 @@
   </div>
 
   <div id="toast" class="toast"></div>
-  <script src="config.js?v=4.7.1"></script>
-  <script src="script.js?v=4.7.1"></script>
+  <script src="config.js?v=4.8"></script>
+  <script src="script.js?v=4.8"></script>
 </body>
 </html>

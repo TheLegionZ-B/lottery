@@ -1,6 +1,6 @@
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const CFG=window.APP_CONFIG||{};
-let state={results:[],predictions:[],currentPrediction:null,predictions6:[],currentPrediction6:null,lastSync:"",source:"",range:50};
+let state={results:[],predictions:[],currentPrediction:null,predictions6:[],currentPrediction6:null,latestPrizeSummary:null,lastSync:"",source:"",range:50};
 
 const DEMO={
   ok:true,source:"Demo data",lastSync:new Date().toISOString(),
@@ -39,6 +39,7 @@ function hydrate(data){
   state.currentPrediction=data.currentPrediction||null;
   state.predictions6=data.predictions6||[];
   state.currentPrediction6=data.currentPrediction6||null;
+  state.latestPrizeSummary=data.latestPrizeSummary||null;
   state.lastSync=data.lastSync||"";
   state.source=data.source||"";
 }
@@ -110,12 +111,64 @@ function makeLocalPreview6(){
     status:"PREVIEW"
   };
 }
+
+function renderPrizeNumbers(target,numbers,length){
+  const el=$(target);
+  const vals=(numbers||[])
+    .map(x=>String(x??"").replace(/\D/g,"").padStart(length,"0").slice(-length))
+    .filter(x=>new RegExp(`^\\d{${length}}$`).test(x))
+    .slice(0,2);
+
+  el.innerHTML=(vals.length?vals:Array(2).fill("-".repeat(length)))
+    .map(n=>`<b>${esc(n)}</b>`)
+    .join("");
+}
+
+function prizeAmountLabel(item){
+  const n=Number(item?.amount||0);
+  return Number.isFinite(n)&&n>0?`${n.toLocaleString("th-TH")} บาท`:"";
+}
+
+function renderLatestPrizeSummary(){
+  const s=state.latestPrizeSummary||{};
+
+  renderPrizeNumbers("#front3Numbers",s.front3?.numbers,3);
+  renderPrizeNumbers("#back3Numbers",s.back3?.numbers,3);
+
+  $("#front3Amount").textContent=prizeAmountLabel(s.front3);
+  $("#back3Amount").textContent=prizeAmountLabel(s.back3);
+
+  const adjacent=(s.adjacentFirst?.numbers||[])
+    .map(x=>String(x??"").replace(/\D/g,"").padStart(6,"0").slice(-6))
+    .filter(x=>/^\d{6}$/.test(x))
+    .slice(0,2);
+
+  const group=$("#adjacentFirstGroup");
+  if(adjacent.length){
+    group.hidden=false;
+    $("#adjacentFirstAmount").textContent=prizeAmountLabel(s.adjacentFirst);
+    $("#adjacentFirstNumbers").innerHTML=adjacent.map(n=>`<b>${esc(n)}</b>`).join("");
+  }else{
+    group.hidden=true;
+    $("#adjacentFirstNumbers").innerHTML="";
+  }
+}
+
+function sixBreakdown(n){
+  const s=String(n||"").padStart(6,"0").slice(-6);
+  return {
+    front3:s.slice(0,3),
+    back3:s.slice(-3),
+    last2:s.slice(-2)
+  };
+}
 function renderLatest(){
   const d=state.results[0];
   $("#latestDate").textContent=d?.displayName||thDate(d?.drawDate);
   $("#firstPrize").textContent=d?.firstPrize||"------";
   $("#last2").textContent=d?.last2||"--";
   $("#lastSync").textContent=state.lastSync?`อัปเดตล่าสุด ${thDateTime(state.lastSync)}`:"อัปเดตข้อมูลอัตโนมัติ";
+  renderLatestPrizeSummary();
 }
 
 function normalizeSixCandidates(value){
@@ -151,9 +204,16 @@ function renderPrediction(){
   if(p6){
     $("#excludedFirstPrize").textContent=p6.excludedFirstPrize||state.results[0]?.firstPrize||"—";
     const sixCandidates=normalizeSixCandidates(p6.candidates);
-    $("#candidate6List").innerHTML=sixCandidates.map((n,i)=>
-      `<div class="candidate6"><strong>${esc(n)}</strong><span>score ${Number((p6.scores||[])[i]||0).toFixed(1)}</span></div>`
-    ).join("") || `<div class="candidate6"><strong>กำลังสร้างใหม่</strong><span>รอ Sync รอบถัดไป</span></div>`;
+    $("#candidate6List").innerHTML=sixCandidates.map((n,i)=>{
+      const b=sixBreakdown(n);
+      return `<div class="candidate6">
+        <div class="candidate6-main">
+          <strong>${esc(n)}</strong>
+          <small>หน้า ${b.front3} · ท้าย ${b.back3} · ท้าย 2 ตัว ${b.last2}</small>
+        </div>
+        <span>score ${Number((p6.scores||[])[i]||0).toFixed(1)}</span>
+      </div>`;
+    }).join("") || `<div class="candidate6"><strong>กำลังสร้างใหม่</strong><span>รอ Sync รอบถัดไป</span></div>`;
   }else{
     $("#candidate6List").innerHTML="";
     $("#excludedFirstPrize").textContent="—";
@@ -164,7 +224,7 @@ function renderAudit(){
   const closed=state.predictions.filter(x=>x.status==="CLOSED").sort((a,b)=>String(b.actualDrawDate).localeCompare(String(a.actualDrawDate))),p=closed[0],badge=$("#auditBadge"),repeat=$("#repeatExplanation");repeat.hidden=true;
   if(!p){$("#auditCandidates").textContent="—";$("#auditActual").textContent="—";$("#auditResult").textContent="ยังไม่มีงวดให้ตรวจ";$("#auditCreated").textContent="—";badge.textContent="รอผล";badge.className="audit-badge pending"}
   else{$("#auditCandidates").textContent=(p.candidates||[]).join(" · ");$("#auditActual").textContent=p.actualLast2||"—";$("#auditCreated").textContent=thDateTime(p.createdAt);if(p.hit){$("#auditResult").textContent=`ตรง ✓ อันดับ ${p.hitRank}`;badge.textContent="ตรง";badge.className="audit-badge hit"}else{$("#auditResult").textContent="ไม่ตรง";badge.textContent="ไม่ตรง";badge.className="audit-badge miss"}if(p.actualRepeatedPrevious)repeat.hidden=false}
-  $("#auditHistory").innerHTML=closed.slice(0,12).map(x=>`<tr><td>${thDate(x.actualDrawDate)}</td><td>${esc(normalizeSixCandidates(x.candidates).join(" · "))}</td><td><b class="two-no">${esc(x.actualLast2||"—")}</b></td><td>${x.hit?`ตรง #${x.hitRank}`:"ไม่ตรง"}</td><td>${x.actualRepeatedPrevious?"ออกซ้ำงวดก่อน (ถูก exclude)":"—"}</td></tr>`).join("")||`<tr><td colspan="5">ยังไม่มีประวัติ</td></tr>`;
+  $("#auditHistory").innerHTML=closed.slice(0,12).map(x=>`<tr><td>${thDate(x.actualDrawDate)}</td><td>${esc((x.candidates||[]).join(" · "))}</td><td><b class="two-no">${esc(x.actualLast2||"—")}</b></td><td>${x.hit?`ตรง #${x.hitRank}`:"ไม่ตรง"}</td><td>${x.actualRepeatedPrevious?"ออกซ้ำงวดก่อน (ถูก exclude)":"—"}</td></tr>`).join("")||`<tr><td colspan="5">ยังไม่มีประวัติ</td></tr>`;
 }
 
 function renderAudit6(){
