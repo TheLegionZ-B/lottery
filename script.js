@@ -1,6 +1,6 @@
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const CFG=window.APP_CONFIG||{};
-let state={results:[],predictions:[],currentPrediction:null,predictions6:[],currentPrediction6:null,latestPrizeSummary:null,lastSync:"",source:"",range:50};
+let state={results:[],predictions:[],currentPrediction:null,predictions6:[],currentPrediction6:null,latestPrizeSummary:null,algorithmPerformance:null,lastSync:"",source:"",range:50};
 
 const DEMO={
   ok:true,source:"Demo data",lastSync:new Date().toISOString(),
@@ -40,6 +40,7 @@ function hydrate(data){
   state.predictions6=data.predictions6||[];
   state.currentPrediction6=data.currentPrediction6||null;
   state.latestPrizeSummary=data.latestPrizeSummary||null;
+  state.algorithmPerformance=data.algorithmPerformance||null;
   state.lastSync=data.lastSync||"";
   state.source=data.source||"";
 }
@@ -305,7 +306,19 @@ function renderAudit(){
   const closed=state.predictions.filter(x=>x.status==="CLOSED").sort((a,b)=>String(b.actualDrawDate).localeCompare(String(a.actualDrawDate))),p=closed[0],badge=$("#auditBadge"),repeat=$("#repeatExplanation");repeat.hidden=true;
   if(!p){$("#auditCandidates").textContent="—";$("#auditActual").textContent="—";$("#auditResult").textContent="ยังไม่มีงวดให้ตรวจ";$("#auditCreated").textContent="—";badge.textContent="รอผล";badge.className="audit-badge pending"}
   else{$("#auditCandidates").textContent=(p.candidates||[]).join(" · ");$("#auditActual").textContent=p.actualLast2||"—";$("#auditCreated").textContent=thDateTime(p.createdAt);if(p.hit){$("#auditResult").textContent=`ตรง ✓ อันดับ ${p.hitRank}`;badge.textContent="ตรง";badge.className="audit-badge hit"}else{$("#auditResult").textContent="ไม่ตรง";badge.textContent="ไม่ตรง";badge.className="audit-badge miss"}if(p.actualRepeatedPrevious)repeat.hidden=false}
-  $("#auditHistory").innerHTML=closed.slice(0,12).map(x=>`<tr><td>${thDate(x.actualDrawDate)}</td><td>${esc((x.candidates||[]).join(" · "))}</td><td><b class="two-no">${esc(x.actualLast2||"—")}</b></td><td>${x.hit?`ตรง #${x.hitRank}`:"ไม่ตรง"}</td><td>${x.actualRepeatedPrevious?"ออกซ้ำงวดก่อน (ถูก exclude)":"—"}</td></tr>`).join("")||`<tr><td colspan="5">ยังไม่มีประวัติ</td></tr>`;
+  $("#auditHistory").innerHTML=closed.slice(0,12).map(x=>{
+    const rowClass=x.hit?"history-hit":"history-miss";
+    const result=x.hit
+      ? `<span class="history-status hit"><i></i>ถูกรางวัล · อันดับ ${x.hitRank}</span>`
+      : `<span class="history-status miss"><i></i>ไม่ตรง</span>`;
+    return `<tr class="${rowClass}">
+      <td>${thDate(x.actualDrawDate)}</td>
+      <td>${esc((x.candidates||[]).join(" · "))}</td>
+      <td><b class="two-no">${esc(x.actualLast2||"—")}</b></td>
+      <td>${result}</td>
+      <td>${x.actualRepeatedPrevious?"ออกซ้ำงวดก่อน (ถูก exclude)":"—"}</td>
+    </tr>`;
+  }).join("")||`<tr><td colspan="5">ยังไม่มีประวัติ</td></tr>`;
 }
 
 function renderAudit6(){
@@ -347,18 +360,78 @@ function renderAudit6(){
     const result=x.hitAnyPrize&&hits.length
       ? hits.map(h=>`${esc(h.number)} → ${esc((h.matches||[]).map(m=>m.name).join(" + "))}`).join("<br>")
       : "ไม่ตรงรางวัล";
-    return `<tr>
+    const rowClass=x.hitAnyPrize?"history-hit":"history-miss";
+    const status=x.hitAnyPrize
+      ? `<span class="history-status hit"><i></i>ถูกรางวัล</span>`
+      : `<span class="history-status miss"><i></i>ไม่ตรง</span>`;
+    return `<tr class="${rowClass}">
       <td>${thDate(x.actualDrawDate)}</td>
       <td>${esc(normalizeSixCandidates(x.candidates).join(" · "))}</td>
       <td><b class="main-no">${esc(x.actualFirstPrize||"—")}</b></td>
       <td>${result}</td>
+      <td>${status}</td>
     </tr>`;
-  }).join("")||`<tr><td colspan="4">ยังไม่มีประวัติ</td></tr>`;
+  }).join("")||`<tr><td colspan="5">ยังไม่มีประวัติ</td></tr>`;
+}
+
+function renderAlgorithmPerformance(){
+  const p=state.algorithmPerformance;
+  const body=$("#algoModelBody");
+  if(!p||!p.tests){
+    $("#algoEnsembleRate").textContent="—";
+    $("#algoEnsembleHits").textContent="รอข้อมูลเพิ่ม";
+    $("#algoTests").textContent=p?.tests||"—";
+    $("#algoBestModel").textContent="—";
+    $("#algoBestRate").textContent="—";
+    $("#algoBaseline").textContent=`${Number(p?.baselineRate??5).toFixed(1)}%`;
+    $("#algoEdgeNote").className="algorithm-edge neutral";
+    $("#algoEdgeNote").textContent="ต้องมีผลย้อนหลังเพียงพอก่อนจึงจะวัด Walk-forward ได้";
+    body.innerHTML='<tr><td colspan="4">รอข้อมูล Backtest</td></tr>';
+    return;
+  }
+
+  const ensemble=p.ensemble||{};
+  const baseline=Number(p.baselineRate||5);
+  const rate=Number(ensemble.rate||0);
+  const edge=rate-baseline;
+  const best=p.bestModel||null;
+
+  $("#algoVersionBadge").textContent=p.label||"ENSEMBLE V3";
+  $("#algoEnsembleRate").textContent=`${rate.toFixed(1)}%`;
+  $("#algoEnsembleHits").textContent=`${ensemble.hits||0} / ${p.tests} งวด`;
+  $("#algoBaseline").textContent=`${baseline.toFixed(1)}%`;
+  $("#algoTests").textContent=String(p.tests);
+  $("#algoBestModel").textContent=best?.label||"—";
+  $("#algoBestRate").textContent=best?`${Number(best.rate||0).toFixed(1)}% · ${best.hits||0}/${p.tests}`:"—";
+
+  const edgeEl=$("#algoEdgeNote");
+  if(edge>0.01){
+    edgeEl.className="algorithm-edge positive";
+    edgeEl.textContent=`Walk-forward สูงกว่า random baseline ${edge>=0?"+":""}${edge.toFixed(1)} percentage points ในชุดทดสอบนี้ — ยังไม่ใช่การรับประกันงวดถัดไป`;
+  }else if(edge<-.01){
+    edgeEl.className="algorithm-edge negative";
+    edgeEl.textContent=`Walk-forward ต่ำกว่า random baseline ${edge.toFixed(1)} percentage points ในชุดทดสอบนี้ ระบบยังคงแสดงผลตามข้อมูลจริง`;
+  }else{
+    edgeEl.className="algorithm-edge neutral";
+    edgeEl.textContent="Walk-forward ใกล้เคียง random baseline ในชุดทดสอบปัจจุบัน";
+  }
+
+  const models=p.models||[];
+  const maxWeight=Math.max(1,...models.map(m=>Number(m.weight||0)));
+  body.innerHTML=models.map(m=>{
+    const width=Math.max(5,Math.round(Number(m.weight||0)/maxWeight*70));
+    return `<tr>
+      <td><span class="algorithm-model-name">${esc(m.label||m.id)}</span></td>
+      <td>${m.hits||0} / ${m.tests||p.tests}</td>
+      <td>${Number(m.rate||0).toFixed(1)}%</td>
+      <td><span class="algorithm-model-weight"><i style="width:${width}px"></i>${Number(m.weightPct||0).toFixed(1)}%</span></td>
+    </tr>`;
+  }).join("")||'<tr><td colspan="4">ไม่มีข้อมูล Model</td></tr>';
 }
 
 function statCounts(){const map=new Map(),digits=Array(10).fill(0);dataRange().forEach(d=>{if(!/^\d{2}$/.test(d.last2))return;map.set(d.last2,(map.get(d.last2)||0)+1);digits[+d.last2[0]]++;digits[+d.last2[1]]++});return{freq:[...map].map(([number,count])=>({number,count})),digits}}
 function renderStats(){const{freq,digits}=statCounts(),hot=[...freq].sort((a,b)=>b.count-a.count||a.number.localeCompare(b.number)).slice(0,5),cold=[...freq].sort((a,b)=>a.count-b.count||a.number.localeCompare(b.number)).slice(0,5),chips=a=>a.map(x=>`<div class="num-chip"><strong>${x.number}</strong><span>${x.count} ครั้ง</span></div>`).join("");$("#hotNumbers").innerHTML=chips(hot);$("#coldNumbers").innerHTML=chips(cold);const max=Math.max(1,...digits);$("#digitChart").innerHTML=digits.map((v,i)=>`<div class="digit-col"><div class="digit-bar" data-value="${v}" style="height:${Math.max(4,v/max*86)}%"></div><b>${i}</b></div>`).join("")}
-function renderHistory(){$("#historyCount").textContent=`(${state.results.length} งวด)`;$("#historyBody").innerHTML=state.results.slice(0,60).map(d=>`<tr><td>${thDate(d.drawDate)}</td><td><span class="main-no">${esc(d.firstPrize)}</span></td><td><span class="two-no">${esc(d.last2)}</span></td></tr>`).join("")||`<tr><td colspan="3">ไม่มีข้อมูล</td></tr>`}
+function renderHistory(){$("#historyCount").textContent=`(${state.results.length} งวด)`;$("#historyBody").innerHTML=state.results.slice(0,100).map(d=>`<tr><td>${thDate(d.drawDate)}</td><td><span class="main-no">${esc(d.firstPrize)}</span></td><td><span class="two-no">${esc(d.last2)}</span></td></tr>`).join("")||`<tr><td colspan="3">ไม่มีข้อมูล</td></tr>`}
 function renderDrawOptions(){
   const select=$("#ticketDate");
   if(!select)return;
@@ -369,7 +442,7 @@ function renderDrawOptions(){
   else if(state.results[0]?.drawDate) select.value=state.results[0].drawDate;
 }
 
-function render(){renderLatest();renderPrediction();renderAudit();renderAudit6();renderStats();renderHistory();renderDrawOptions()}
+function render(){renderLatest();renderPrediction();renderAudit();renderAudit6();renderAlgorithmPerformance();renderStats();renderHistory();renderDrawOptions()}
 
 /* =========================
    Prize checker + animated modal

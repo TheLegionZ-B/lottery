@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="สถิติผลสลากย้อนหลัง ตรวจรางวัล และบันทึกการคาดการณ์แบบตรวจสอบย้อนหลังได้">
   <title>Lottery Insight</title>
-  <link rel="stylesheet" href="style.css?v=5.0.1">
+  <link rel="stylesheet" href="style.css?v=5.1">
 </head>
 <body>
   <div id="pageLoader" class="page-loader" aria-live="polite">
@@ -124,7 +124,7 @@
         <div class="prediction-block six-block">
           <div class="prediction-block-head">
             <strong>เลขสลาก 6 หลัก</strong>
-            <small>Coverage + Diversity · กระจาย Candidate ให้ต่างกัน</small>
+            
           </div>
           <div id="candidate6List" class="candidate6-list"></div>
           <div class="exclude-note">
@@ -138,7 +138,7 @@
           <div class="logic-two-col">
             <div>
               <b>2 ตัว</b>
-              <span>40% หลักสิบ + 40% หลักหน่วย + 20% เลขทั้งคู่ แล้ว Diversity re-ranking</span>
+              <span>หลายโมเดลทดสอบย้อนหลังแบบไม่เห็นอนาคต แล้วรวมคะแนนเป็น Ensemble สำหรับงวดถัดไป</span>
             </div>
             <div>
               <b>6 หลัก</b>
@@ -146,7 +146,7 @@
             </div>
           </div>
           <p>
-            ใช้ข้อมูลย้อนหลังสูงสุด 50 งวดตามที่มีในระบบ ให้งวดใหม่มีน้ำหนักมากกว่าเล็กน้อย
+            ใช้ข้อมูลย้อนหลังที่มีในระบบแบบ Walk-forward โดยแต่ละงวดใช้เฉพาะข้อมูลก่อนหน้านั้น
             ไม่มี Random และคัด Top 5 แบบกระจายความซ้ำ ทั้งเลข 2 ตัวและ 6 หลัก ก่อน Lock Snapshot รอผล
             <b>Stat score เป็นคะแนนจัดอันดับ ไม่ใช่ Probability</b>
           </p>
@@ -268,11 +268,58 @@
         <div class="table-wrap">
           <table>
             <thead>
-              <tr><th>งวดที่ตรวจ</th><th>Candidate</th><th>รางวัลที่ 1</th><th>ผลตรวจ Candidate</th></tr>
+              <tr><th>งวดที่ตรวจ</th><th>Candidate</th><th>รางวัลที่ 1</th><th>ผลตรวจ Candidate</th><th>สถานะ</th></tr>
             </thead>
             <tbody id="audit6History"></tbody>
           </table>
         </div>
+      </details>
+    </section>
+
+    <section class="card algorithm-card">
+      <div class="section-head algorithm-head">
+        <div>
+          <span class="label">Algorithm Performance</span>
+          <h2>Walk-forward Backtest</h2>
+          <p class="algorithm-subtitle">ทดสอบทีละงวดโดยใช้เฉพาะข้อมูลที่มีอยู่ก่อนงวดนั้น</p>
+        </div>
+        <span id="algoVersionBadge" class="snapshot-badge">ENSEMBLE V3</span>
+      </div>
+
+      <div class="algorithm-kpis">
+        <div class="algorithm-kpi primary">
+          <span>Ensemble Top-5</span>
+          <strong id="algoEnsembleRate">—</strong>
+          <small id="algoEnsembleHits">รอข้อมูล</small>
+        </div>
+        <div class="algorithm-kpi">
+          <span>Random baseline</span>
+          <strong id="algoBaseline">5.0%</strong>
+          <small>Top 5 จาก 00–99</small>
+        </div>
+        <div class="algorithm-kpi">
+          <span>งวดที่ทดสอบ</span>
+          <strong id="algoTests">—</strong>
+          <small>Walk-forward</small>
+        </div>
+        <div class="algorithm-kpi">
+          <span>Model เดี่ยวที่ดีที่สุด</span>
+          <strong id="algoBestModel">—</strong>
+          <small id="algoBestRate">—</small>
+        </div>
+      </div>
+
+      <div id="algoEdgeNote" class="algorithm-edge neutral">ยังไม่มีข้อมูล Backtest เพียงพอ</div>
+
+      <details class="algorithm-details">
+        <summary>ดู Algorithm Arena</summary>
+        <div class="table-wrap algorithm-table-wrap">
+          <table>
+            <thead><tr><th>Model</th><th>Top-5 Hit</th><th>Hit rate</th><th>น้ำหนักงวดหน้า</th></tr></thead>
+            <tbody id="algoModelBody"><tr><td colspan="4">รอข้อมูล</td></tr></tbody>
+          </table>
+        </div>
+        <p class="algorithm-footnote">น้ำหนักถูกปรับแบบ conservative และมี prior ใกล้ baseline เพื่อลดการไล่ตามผลชนะระยะสั้น</p>
       </details>
     </section>
 
@@ -344,7 +391,7 @@
   </div>
 
   <div id="toast" class="toast"></div>
-  <script src="config.js?v=5.0.1"></script>
-  <script src="script.js?v=5.0.1"></script>
+  <script src="config.js?v=5.1"></script>
+  <script src="script.js?v=5.1"></script>
 </body>
 </html>

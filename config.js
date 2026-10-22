@@ -1,5 +1,5 @@
 // Public website configuration.
 window.APP_CONFIG = {
-  DATA_URL: "https://script.google.com/macros/s/AKfycbyhsUv-7k1tY4zw-Y_PBhx_GWveAfas-gS9CIbFXDBj8ENbiFOKoMCqgckLtub1oUDQ/exec",
+  DATA_URL: "https://script.google.com/macros/s/AKfycbw6z5PWK92_4Wl92vtIJ7FboSoP4M8KLsQ3smRz28GS7SmXwMWVptbXJWzNK6v3K_7N/exec",
   DEMO_MODE: true
 };
