@@ -1,5 +1,4 @@
-// Public website configuration.
+// Lottery Insight v5.3.0. Set your deployed read-only Apps Script /exec URL.
 window.APP_CONFIG = {
-  DATA_URL: "https://script.google.com/macros/s/AKfycbyfnaGgTXe-PYmu_LnWTmjlTvpElvLSWGkRRcVr6aw8mXr1WAuWn-NF9pLrbuNMfGab/exec",
-  DEMO_MODE: true
+  DATA_URL: 'https://script.google.com/macros/s/AKfycbyiDuuOi2l3GLyIqvf01Op23FaldyHNWB4mbraEy90MXbbJwd80OOZVOZ9bsYfn2W-T/exec'
 };

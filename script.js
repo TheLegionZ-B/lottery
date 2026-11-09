@@ -2,31 +2,6 @@ const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const CFG=window.APP_CONFIG||{};
 let state={results:[],predictions:[],currentPrediction:null,predictions6:[],currentPrediction6:null,latestPrizeSummary:null,algorithmPerformance:null,news:null,lastSync:"",source:"",range:50};
 
-const DEMO={
-  ok:true,source:"Demo data",lastSync:new Date().toISOString(),
-  results:[
-    {drawDate:"2026-10-16",displayName:"งวดวันที่ 16 ตุลาคม 2569",firstPrize:"011781",last2:"48",
-      prizes:[
-        {slug:"first-prize",name:"รางวัลที่ 1",amount:"6000000.00",numbers:["011781"]},
-        {slug:"last-two-digit",name:"เลขท้าย 2 ตัว",amount:"2000.00",numbers:["48"]}
-      ],completePrizeData:false},
-    {drawDate:"2026-10-01",displayName:"งวดวันที่ 1 ตุลาคม 2569",firstPrize:"402701",last2:"70",
-      prizes:[
-        {slug:"first-prize",name:"รางวัลที่ 1",amount:"6000000.00",numbers:["402701"]},
-        {slug:"last-two-digit",name:"เลขท้าย 2 ตัว",amount:"2000.00",numbers:["70"]}
-      ],completePrizeData:false},
-    {drawDate:"2026-09-16",displayName:"งวดวันที่ 16 กันยายน 2569",firstPrize:"730640",last2:"64",prizes:[],completePrizeData:false},
-    {drawDate:"2026-09-01",displayName:"งวดวันที่ 1 กันยายน 2569",firstPrize:"417212",last2:"04",prizes:[],completePrizeData:false},
-    {drawDate:"2026-08-16",displayName:"งวดวันที่ 16 สิงหาคม 2569",firstPrize:"004615",last2:"53",prizes:[],completePrizeData:false},
-    {drawDate:"2026-08-01",displayName:"งวดวันที่ 1 สิงหาคม 2569",firstPrize:"932479",last2:"69",prizes:[],completePrizeData:false},
-    {drawDate:"2026-07-16",displayName:"งวดวันที่ 16 กรกฎาคม 2569",firstPrize:"639214",last2:"71",prizes:[],completePrizeData:false},
-    {drawDate:"2026-07-01",displayName:"งวดวันที่ 1 กรกฎาคม 2569",firstPrize:"751495",last2:"62",prizes:[],completePrizeData:false},
-    {drawDate:"2026-06-16",displayName:"งวดวันที่ 16 มิถุนายน 2569",firstPrize:"287184",last2:"48",prizes:[],completePrizeData:false},
-    {drawDate:"2026-06-01",displayName:"งวดวันที่ 1 มิถุนายน 2569",firstPrize:"173770",last2:"95",prizes:[],completePrizeData:false}
-  ],
-  predictions:[],currentPrediction:null,predictions6:[],currentPrediction6:null
-};
-
 function toast(m){const e=$("#toast");e.textContent=m;e.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("show"),2000)}
 function applyTheme(v){document.body.classList.toggle("dark",v==="dark");$("#themeBtn").textContent=v==="dark"?"☀️":"🌙";localStorage.setItem("lottery-theme",v)}
 function thDate(s){if(!s)return"—";const d=new Date(String(s).slice(0,10)+"T00:00:00");return Number.isNaN(d.getTime())?s:d.toLocaleDateString("th-TH",{day:"numeric",month:"short",year:"numeric"})}
@@ -58,146 +33,16 @@ async function load(initial=false){
       const r=await fetch(CFG.DATA_URL+"?mode=dashboard&t="+Date.now(),{cache:"no-store"});
       if(!r.ok)throw new Error("HTTP "+r.status);
       data=await r.json();if(!data.ok)throw new Error(data.error||"API error");
-    }else if(CFG.DEMO_MODE){data=DEMO}else{throw new Error("ยังไม่ได้ตั้งค่าแหล่งข้อมูล")}
-    hydrate(data);render();$("#statusText").textContent=CFG.DATA_URL?"อัปเดตอัตโนมัติ":"Demo";
+    }else{throw new Error("ยังไม่ได้กำหนด DATA_URL สำหรับเชื่อม Backend จริง")}
+    hydrate(data);render();$("#statusText").textContent="อัปเดตอัตโนมัติ";
   }catch(err){console.error(err);$("#statusText").textContent="เชื่อมต่อไม่ได้";toast("เชื่อมต่อข้อมูลไม่สำเร็จ")}
   finally{if(initial)setTimeout(hidePageLoader,180)}
 }
 function dataRange(){return state.range==="all"?state.results:state.results.slice(0,Math.min(Number(state.range),state.results.length))}
-function makeLocalPreview(){
-  const rows=state.results.slice(0,50);
-  if(!rows.length)return null;
-
-  const latest=rows[0].last2;
-  const tens=Array(10).fill(1);
-  const ones=Array(10).fill(1);
-  const pairs=Array(100).fill(.25);
-  const n=rows.length;
-
-  rows.forEach((d,i)=>{
-    if(!/^\d{2}$/.test(d.last2))return;
-    const w=1+((n-i)/n)*.5;
-    tens[+d.last2[0]]+=w;
-    ones[+d.last2[1]]+=w;
-    pairs[+d.last2]+=w;
-  });
-
-  const maxT=Math.max(...tens),maxO=Math.max(...ones),maxP=Math.max(...pairs);
-  const ranked=[];
-
-  for(let i=0;i<100;i++){
-    const number=String(i).padStart(2,"0");
-    if(number===latest)continue;
-
-    const base=(
-      .40*tens[+number[0]]/maxT+
-      .40*ones[+number[1]]/maxO+
-      .20*pairs[i]/maxP
-    )*100;
-
-    ranked.push({number,base});
-  }
-
-  ranked.sort((a,b)=>b.base-a.base||a.number.localeCompare(b.number));
-
-  const bestBase=ranked[0]?.base||1;
-  let pool=ranked.filter(x=>x.base>=bestBase*.72).slice(0,70);
-  if(pool.length<25)pool=ranked.slice(0,70);
-
-  const selected=[];
-
-  const diversity=(cand)=>{
-    if(!selected.length)return 1;
-    const uniqueT=selected.every(s=>s.number[0]!==cand.number[0])?1:0;
-    const uniqueO=selected.every(s=>s.number[1]!==cand.number[1])?1:0;
-    const minH=Math.min(...selected.map(s=>
-      (s.number[0]!==cand.number[0]?1:0)+(s.number[1]!==cand.number[1]?1:0)
-    ));
-    return .45*uniqueT+.45*uniqueO+.10*(minH/2);
-  };
-
-  const choose=(mode)=>{
-    let best=null;
-    pool.forEach(c=>{
-      if(selected.some(s=>s.number===c.number))return;
-      const sameT=selected.some(s=>s.number[0]===c.number[0]);
-      const sameO=selected.some(s=>s.number[1]===c.number[1]);
-
-      if(mode===0&&selected.length&&(sameT||sameO))return;
-      if(mode===1&&selected.length&&sameT&&sameO)return;
-
-      const objective=.80*(c.base/bestBase)+.20*diversity(c);
-      if(!best||objective>best.objective||
-         (objective===best.objective&&c.base>best.base)||
-         (objective===best.objective&&c.base===best.base&&c.number<best.number)){
-        best={...c,objective};
-      }
-    });
-    return best;
-  };
-
-  while(selected.length<5){
-    let next=choose(0);
-    if(!next)next=choose(1);
-    if(!next)next=choose(2);
-    if(!next)break;
-    selected.push(next);
-  }
-
-  const topObjective=selected[0]?.objective||1;
-  return {
-    basedOnDrawDate:rows[0].drawDate,
-    excludedLast2:latest,
-    candidates:selected.map(x=>x.number),
-    scores:selected.map(x=>+(x.objective/topObjective*100).toFixed(1)),
-    status:"PREVIEW"
-  };
-}
-
-function makeLocalPreview6(){
-  const rows=state.results.slice(0,50).filter(d=>/^\d{6}$/.test(d.firstPrize||""));
-  if(!rows.length)return null;
-  const n=rows.length;
-  const pos=Array.from({length:6},()=>Array(10).fill(1));
-
-  rows.forEach((d,i)=>{
-    const w=1+((n-i)/n)*.35;
-    [...d.firstPrize].forEach((ch,p)=>pos[p][Number(ch)]+=w);
-  });
-
-  const rankedDigits=pos.map(arr=>{
-    const max=Math.max(...arr);
-    return arr.map((v,d)=>({digit:String(d),score:v/max}))
-      .sort((a,b)=>b.score-a.score||a.digit.localeCompare(b.digit))
-      .slice(0,4);
-  });
-
-  let beam=[{number:"",sum:0}];
-  rankedDigits.forEach(options=>{
-    const next=[];
-    beam.forEach(base=>options.forEach(o=>{
-      next.push({number:base.number+o.digit,sum:base.sum+o.score});
-    }));
-    next.sort((a,b)=>b.sum-a.sum||a.number.localeCompare(b.number));
-    beam=next.slice(0,80);
-  });
-
-  const excluded=rows[0].firstPrize;
-  const top=beam.filter(x=>x.number!==excluded).slice(0,5);
-  const max=top[0]?.sum||1;
-  return {
-    basedOnDrawDate:rows[0].drawDate,
-    excludedFirstPrize:excluded,
-    candidates:top.map(x=>x.number),
-    scores:top.map(x=>+(x.sum/max*100).toFixed(1)),
-    status:"PREVIEW"
-  };
-}
-
 function renderPrizeNumbers(target,numbers,length){
   const el=$(target);
   const vals=(numbers||[])
-    .map(x=>String(x??"").replace(/\D/g,"").padStart(length,"0").slice(-length))
+    .map(x=>String(x??"").trim())
     .filter(x=>new RegExp(`^\\d{${length}}$`).test(x))
     .slice(0,2);
 
@@ -221,7 +66,7 @@ function renderLatestPrizeSummary(){
   $("#back3Amount").textContent=prizeAmountLabel(s.back3);
 
   const adjacent=(s.adjacentFirst?.numbers||[])
-    .map(x=>String(x??"").replace(/\D/g,"").padStart(6,"0").slice(-6))
+    .map(x=>String(x??"").trim())
     .filter(x=>/^\d{6}$/.test(x))
     .slice(0,2);
 
@@ -271,7 +116,7 @@ function normalizeSixCandidates(value){
   return [];
 }
 function renderPrediction(){
-  const p=state.currentPrediction||(!CFG.DATA_URL?makeLocalPreview():null);
+  const p=state.currentPrediction||null;
   if(p){
     $("#predictionSub").textContent=`อิงข้อมูลถึงงวด ${thDate(p.basedOnDrawDate)}`;
     $("#excludedLast2").textContent=p.excludedLast2||state.results[0]?.last2||"—";
@@ -283,7 +128,7 @@ function renderPrediction(){
     $("#excludedLast2").textContent=state.results[0]?.last2||"—";
   }
 
-  const p6=state.currentPrediction6||(!CFG.DATA_URL?makeLocalPreview6():null);
+  const p6=state.currentPrediction6||null;
   if(p6){
     $("#excludedFirstPrize").textContent=p6.excludedFirstPrize||state.results[0]?.firstPrize||"—";
     const sixCandidates=normalizeSixCandidates(p6.candidates);
@@ -442,7 +287,7 @@ function newsNumberChips(items,maxLength){
   ).map((x,i)=>`<div class="news-number-card">
     <small>อันดับ ${i+1}</small>
     <strong>${esc(x.number)}</strong>
-    <span>${Number(x.sourceCount||0)} แหล่ง · ${Number(x.mentions||0)} ข่าว</span>
+    <span>${Number(x.sourceCount||0)} สำนัก · ${Number(x.mentions||0)} ชุดข้อมูล</span>
   </div>`).join('')||'<span class="news-empty">ยังไม่มีเลขที่ผ่านการตรวจสอบ</span>';
 }
 function renderNews(){
@@ -456,15 +301,15 @@ function renderNews(){
   if(diagEl){
     const v=String(n.engineVersion||'');
     const d=n.diagnostics||{};
-    const old=!v||v==='5.2'||v==='5.2.1';
+    const old=!v||!/^5\.3(?:\.|$)/.test(v);
     const noData=empty&&!error&&n.enabled!==false;
     diagEl.hidden=!(old||noData);
     diagEl.textContent=old
       ? 'Backend ข่าวเป็นรุ่นเก่า: ตรวจ DATA_URL แล้ว Deploy → New version'
       : noData && d.reason==='configure-structured-source'
-      ? 'ยังไม่ได้ตั้งแหล่งข้อมูลเลขเด็ดแบบมีโครงสร้าง: เติมชีต NewsStructured หรือกำหนด JSON feed ใน Script Properties'
+      ? 'ไม่มีเลขที่ยืนยันได้จากแหล่งข่าวอัตโนมัติสำหรับงวดนี้: ตรวจ probeLotteryNewsSource() ใน Apps Script'
       : noData
-      ? 'ไม่มีชุดเลขที่ผ่านการตรวจรูปแบบสำหรับงวดนี้: ดู diagnoseStructuredNews() ใน Apps Script'
+      ? 'ไม่พบชุดเลขสำหรับงวดนี้: ดู diagnoseLotteryNews() ใน Apps Script'
       : '';
   }
   if(disabled){status.textContent='ปิดใช้งาน';status.className='news-status';}
@@ -486,7 +331,7 @@ function renderNews(){
   ov.textContent=overlaps.length
     ? 'เลขที่ตรงกันระหว่างข่าวกับ Candidate ของ Algorithm: '+overlaps.join(' · ')
     : '';
-  $('#newsArticleCount').textContent=`${Number(n.articleCount||0)} ข่าว · ${Number(n.sourceCount||0)} สำนัก · ${Number(n.pickSourceCount||0)} ชุดที่มา`;
+  $('#newsArticleCount').textContent=`${Number(n.articleCount||0)} หน้ารวม · ${Number(n.sourceCount||0)} สำนัก · ${Number(n.pickSourceCount||0)} ชุดเลข`;
   const articles=Array.isArray(n.articles)?n.articles:[];
   $('#newsArticles').innerHTML=articles.map(a=>{
     const url=newsSafeLink(a.url);
@@ -495,11 +340,11 @@ function renderNews(){
       .filter(x=>/^\d{2,3}$/.test(String(x))).slice(0,8);
     return `<a class="news-article" href="${esc(url)}" target="_blank" rel="noopener noreferrer nofollow">
       <span class="news-article-title">${esc(a.title||'ข่าว')}</span>
-      <span class="news-article-meta">${esc(a.source||'แหล่งข่าว')} · ${thDate(a.publishedAt)}</span>
+      <span class="news-article-meta">${esc(a.source||'แหล่งข่าว')} · รวบรวมเมื่อ ${thDate(a.publishedAt)}</span>
       <span class="news-article-tipster">ที่มาของชุดเลข: ${esc(a.pickSource||a.source||'ไม่ระบุ')}${(a.featured||[]).length?' · เด่น '+(a.featured||[]).filter(x=>/^\d$/.test(String(x))).map(esc).join(' · '):''}</span>
       ${tags.length?`<span class="news-article-tags">${tags.map(x=>`<b>${esc(x)}</b>`).join('')}</span>`:''}
     </a>`;
-  }).join('') || `<div class="news-empty news-empty-block">${error?'ยังเชื่อมต่อแหล่งข่าวไม่ได้ แต่ระบบตรวจสลากยังทำงานตามปกติ':'ยังไม่มีเลข 2/3 ตัวจากข้อมูลที่แยกหมวดแล้ว (เพิ่มใน NewsStructured หรือกำหนด Structured JSON feed)'}</div>`;
+  }).join('') || `<div class="news-empty news-empty-block">${error?'ยังเชื่อมต่อแหล่งข่าวไม่ได้ แต่ระบบตรวจสลากยังทำงานตามปกติ':'ยังไม่มีเลขที่แหล่งข่าวระบุแยกเป็นชุด 2/3 ตัวสำหรับงวดนี้'}</div>`;
   const history=Array.isArray(n.history)?n.history:[];
   $('#newsAuditHistory').innerHTML=history.map(x=>{
     const two=x.hit2===true
@@ -611,49 +456,16 @@ function initTicketRows(){
   updateTicketRows();
 }
 
-function isFront3Prize(p){const s=(p.slug+" "+p.name).toLowerCase();return /front|first-three|หน้า\s*3|เลขหน้า/.test(s)}
-function isBack3Prize(p){const s=(p.slug+" "+p.name).toLowerCase();return /last-three|back|ท้าย\s*3|เลขท้าย\s*3/.test(s)}
-function isLast2Prize(p){const s=(p.slug+" "+p.name).toLowerCase();return /last-two|ท้าย\s*2|เลขท้าย\s*2/.test(s)}
-function matchPrize(number,p){
-  const nums=(p.numbers||[]).map(String),six=number.padStart(6,"0");
-  if(isLast2Prize(p))return nums.includes(six.slice(-2));
-  if(isFront3Prize(p))return nums.includes(six.slice(0,3));
-  if(isBack3Prize(p))return nums.includes(six.slice(-3));
-  return nums.includes(six);
-}
-function checkAgainstDraw(number,draw){
-  const prizes=Array.isArray(draw.prizes)?draw.prizes:[];
-  return prizes.filter(p=>matchPrize(number,p)).map(p=>({
-    name:p.name||p.slug||"รางวัล",
-    amount:p.amount||"",
-    numbers:p.numbers||[]
-  }));
-}
-
 async function requestCheckMany(numbers,date){
-  if(CFG.DATA_URL){
-    const u=new URL(CFG.DATA_URL);
-    u.searchParams.set("mode","check-many");
-    u.searchParams.set("drawDate",date);
-    u.searchParams.set("numbers",numbers.join(","));
-    u.searchParams.set("t",Date.now());
-    const r=await fetch(u.toString(),{cache:"no-store"});
-    if(!r.ok)throw Error("HTTP "+r.status);
-    return await r.json();
-  }
-
-  const draw=state.results.find(x=>x.drawDate===date);
-  if(!draw)return {ok:true,found:false,results:[]};
-  return {
-    ok:true,
-    found:true,
-    draw,
-    completePrizeData:!!draw.completePrizeData,
-    results:numbers.map(number=>({
-      number,
-      matches:checkAgainstDraw(number,draw)
-    }))
-  };
+  if(!CFG.DATA_URL)throw new Error('Missing Backend DATA_URL');
+  const u=new URL(CFG.DATA_URL);
+  u.searchParams.set('mode','check-many');
+  u.searchParams.set('drawDate',date);
+  u.searchParams.set('numbers',numbers.join(','));
+  u.searchParams.set('t',Date.now());
+  const r=await fetch(u.toString(),{cache:'no-store'});
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  return await r.json();
 }
 
 function prizeAmountForMatches(matches){
