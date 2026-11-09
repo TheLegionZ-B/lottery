@@ -1,4 +1,4 @@
-# 🎯 Lottery Insight v5.1
+# 🎯 Lottery Insight v5.2
 
 > Personal lottery statistics experiment by **TheLegionZ**
 
@@ -8,6 +8,63 @@ Lottery Insight เป็นเว็บสำหรับดูผลสลา�
 > ระบบนี้จัดทำเพื่อการศึกษา ทดลองสถิติ และความบันเทิงเท่านั้น  
 > **Stat score ไม่ใช่ Probability และไม่มี Algorithm ใดรับประกันผลสลากงวดถัดไปได้**  
 > ผลรางวัลอย่างเป็นทางการให้ยึดข้อมูลจาก **สำนักงานสลากกินแบ่งรัฐบาล (GLO)** เป็นหลัก
+
+---
+
+
+## 📰 New in v5.2 — Lottery News Intelligence
+
+เพิ่มการ์ด **เลขดังจากข่าว** แยกจาก Prediction หลัก เพื่อรวบรวมเลข 2 ตัวและ 3 ตัวที่มีการกล่าวถึงอย่างชัดเจนจากข่าวออนไลน์ พร้อมจำนวนข่าว/สำนักข่าว วันที่เผยแพร่ และลิงก์ต้นฉบับ ไม่แสดงเนื้อหาข่าวเต็มฉบับ
+
+- **Auto News Sync:** ใช้ Trigger `syncLottery()` รายชั่วโมงเดิม และดึงข่าวใหม่ประมาณทุก **6 ชั่วโมง** เมื่ออยู่ก่อน Cutoff ของงวด
+- **แหล่งข่าว:** RSS (ไม่ต้องใช้ API Key แต่ความพร้อมขึ้นกับบริการต้นทาง); หรือ GNews API หากตั้งค่า `GNEWS_API_KEY` เป็น Script Property ฝั่ง Backend
+- **Extract:** ตัดวันที่, ปี พ.ศ., เบอร์โทร และข้อความประกาศผลหวยออกแล้ว เพื่อป้องกันการนับเลขผิดบริบท
+- **Dedup:** กรองบทความ URL/หัวข้อซ้ำ และจำกัดน้ำหนักข่าวจากสำนักเดียวกัน
+- **Snapshot Audit:** เก็บเลขข่าวก่อนผลออก; เมื่อเปลี่ยนชุดให้ Snapshot เก่าเป็น `SUPERSEDED` และนับเพียงชุดสุดท้ายของงวดเพื่อตรวจจริง
+- **Audit 2/3 หลัก:** ตรวจเลขข่าว 2 ตัวกับเลขท้าย 2 ตัวของงวดถัดไป และตรวจเลข 3 ตัวกับรางวัลหน้า/ท้าย 3 ตัวหากข้อมูลรางวัลครบ หากไม่ครบจะแสดงสถานะไม่ทราบผล ไม่สรุปว่าแพ้
+- **Model overlap:** ดูเลขที่ตรงกับชุดจาก Ensemble v3 โดยไม่เปลี่ยน Algorithm หลัก
+- **Fault isolation:** หากข่าวดึงไม่ได้ ระบบตรวจสลาก, History และ Prediction เดิมยังทำงานได้ตามปกติ
+
+> **ยังไม่ได้เพิ่มโอกาสถูกรางวัลที่พิสูจน์ได้:** ข้อมูลข่าวเป็นข้อมูล *กระแสสังคม* และไม่ใช่หลักฐานว่าเลขใดออกง่ายกว่าเลขอื่น v5.2 จึงไม่เอา News Score ไปเพิ่มน้ำหนัก Algorithm อัตโนมัติ การใช้ร่วมกันควรทดลอง Walk-forward และเปรียบเทียบกับ baseline เมื่อมีข้อมูลจริงมากพอ
+
+### ⚡ Upgrade จาก v5.1.1 เป็น v5.2
+
+1. **สำรอง Google Sheet และ Code.gs เดิม** ก่อนอัปเดต
+2. แทน `Code.gs` ด้วยเวอร์ชัน v5.2 จาก ZIP ของ Private Backend
+3. Run `setupSystem()` หนึ่งครั้ง → สร้างชีต **NewsArticles** และ **NewsSnapshots** โดยไม่ลบชีตเดิม
+4. Run `syncLotteryNews()` หนึ่งครั้ง → ทดลองแหล่งข่าวและสร้าง Snapshot ถ้ามีข่าวที่เข้าหลักเกณฑ์ก่อนเวลาปิดงวด
+5. Run `syncLottery()` เพื่อตรวจระบบผลสลากหลัก
+6. Deploy → Manage deployments → Edit → **New version** → Deploy
+7. อัปโหลด Frontend จาก ZIP v5.2 รวมโฟลเดอร์ **assets/** ที่เป็นโลโก้และ Favicon; รักษาค่า `DATA_URL` เดิมใน `config.js` และตั้ง `DEMO_MODE:false`
+8. Refresh หน้าเว็บ และตรวจ **SystemLog** หากแหล่งข่าวไม่มีข้อมูล
+
+**ไม่ต้อง Run `installAutomation()` ซ้ำ** หาก Trigger `syncLottery` รายชั่วโมงยังอยู่ ระบบข่าวจะใช้ Trigger เดิมโดยควบคุมรอบ 6 ชั่วโมงภายใน Backend
+
+### 🔐 GNews API Key (ไม่บังคับ)
+
+ถ้า RSS ไม่สามารถดึงข่าวได้หรือได้ข้อมูลน้อย สามารถสมัคร GNews API และตั้งค่าใน
+**Apps Script → Project Settings → Script Properties → `GNEWS_API_KEY`** โดยไม่ใส่ API Key ใน `config.js` หรือ Public GitHub; จากนั้น Run `syncLotteryNews()` อีกครั้ง
+
+GNews Free ณ วันที่จัดทำจำกัดคำขอ 100 ครั้งต่อวัน, ข่าวล่าสุดล่าช้า 12 ชั่วโมง และจำกัดการใช้งานที่ไม่ใช่เชิงพาณิชย์ตามข้อกำหนดผู้ให้บริการ ตรวจเงื่อนไขล่าสุดที่ <https://gnews.io/>
+
+### ⏱️ Cutoff / งวดที่คาดไว้
+
+ระบบประมาณวันงวดถัดไปจากรอบปกติ **วันที่ 1/16** และหยุดสร้าง Snapshot ใหม่หลัง **14:00 น. (Asia/Bangkok)** ของวันงวดที่คาดไว้ เพื่อลดความเสี่ยงข้อมูลหลังผลออกถูกนำมาย้อนอ้างว่าเป็น Prediction ก่อนผลออก หากมีการเลื่อนวันออกรางวัลจริง อาจต้องเพิ่มตารางวันงวดพิเศษในอนาคต
+
+### 🧱 ชีตใหม่
+
+`NewsArticles` เก็บหัวข้อข่าว, URL, สำนักข่าว, วันเผยแพร่, รายการเลข 2/3 หลักเป็น JSON Text และงวดอ้างอิง
+
+`NewsSnapshots` เก็บเลขจากข่าวที่ Lock ก่อนผลออก, สถานะ `OPEN / SUPERSEDED / CLOSED`, ผลจริง และรายละเอียด Audit
+
+**ข้อมูลชีต Results / Predictions / Predictions6 / SystemLog และอัลกอริทึม v3 / v2 ไม่ถูกเขียนทับโดย News Intelligence**
+
+### 🧪 การทดสอบ v5.2
+
+- Syntax checks: **Code.gs / script.js / config.js ผ่าน**
+- Backend automated tests: **14/14 ผ่าน** (เลข `08`, พ.ศ., ข่าวผลหวยเก่า, URL ไม่ปลอดภัย, หัวข้อซ้ำ, Snapshot, Audit, Fault isolation ฯลฯ)
+- UI ด้วย mock API: **Desktop 1440px / Mobile 390px ผ่าน**, ไม่มี JavaScript error หรือ Horizontal overflow
+- **ยังไม่ยืนยันการรันในบัญชี Apps Script ของคุณ หรือการตอบกลับของ RSS/News API สดในเวลาที่ Deploy** — ให้ Run `syncLotteryNews()` และตรวจ `SystemLog` หลังอัปเดต
 
 ---
 
@@ -319,6 +376,8 @@ setupSystem()
 Results
 Predictions
 Predictions6
+NewsArticles
+NewsSnapshots
 SystemLog
 ```
 
@@ -655,7 +714,7 @@ Lottery Insight เป็น Project ทดลองด้านข้อมู�
 
 **TheLegionZ**
 
-Lottery Insight v5.1  
+Lottery Insight v5.2  
 Personal Statistics Experiment
 
 ---
@@ -663,7 +722,7 @@ Personal Statistics Experiment
 ## 📌 Version
 
 ```text
-Current Version : 5.1
+Current Version : 5.2
 Prediction 2D   : Algorithm v3 — Walk-forward Ensemble
 Prediction 6D   : Algorithm v2
 Frontend        : GitHub Pages
