@@ -1436,3 +1436,6 @@ body.dark .algorithm-edge.negative{background:#352715;color:#efc37e;border-color
 .news-unknown{color:var(--amber);font-size:10px}
 @media(max-width:850px){.news-layout{grid-template-columns:1fr}}
 @media(max-width:600px){.news-card{padding:17px}.news-chips{grid-template-columns:repeat(3,minmax(0,1fr))}.news-head{align-items:flex-start}.news-meta{font-size:10px}.news-number-card strong{font-size:21px}.news-nav{display:none}}
+
+/* News v5.2.1 — separate publisher from original pick source */
+.news-article-tipster{font-size:10px;color:var(--green);font-weight:700;line-height:1.5;display:block}

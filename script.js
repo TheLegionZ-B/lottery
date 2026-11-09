@@ -455,7 +455,7 @@ function renderNews(){
   if(disabled){status.textContent='ปิดใช้งาน';status.className='news-status';}
   else if(error){status.textContent='แหล่งข่าวขัดข้อง';status.className='news-status warning';}
   else if(waiting){status.textContent='รอประกาศผลใหม่';status.className='news-status';}
-  else if(empty){status.textContent='ยังไม่มีเลขจากข่าว';status.className='news-status';}
+  else if(empty){status.textContent='ยังไม่มีชุดเลขยืนยัน';status.className='news-status';}
   else{status.textContent='รวบรวมอัตโนมัติ';status.className='news-status ready';}
   $('#newsPeriod').textContent=n.targetDrawDate
     ? 'ติดตามงวดประมาณ '+thDate(n.targetDrawDate)
@@ -471,7 +471,7 @@ function renderNews(){
   ov.textContent=overlaps.length
     ? 'เลขที่ตรงกันระหว่างข่าวกับ Candidate ของ Algorithm: '+overlaps.join(' · ')
     : '';
-  $('#newsArticleCount').textContent=`${Number(n.articleCount||0)} ข่าว · ${Number(n.sourceCount||0)} แหล่ง`;
+  $('#newsArticleCount').textContent=`${Number(n.articleCount||0)} ข่าว · ${Number(n.sourceCount||0)} สำนัก · ${Number(n.pickSourceCount||0)} ชุดที่มา`;
   const articles=Array.isArray(n.articles)?n.articles:[];
   $('#newsArticles').innerHTML=articles.map(a=>{
     const url=newsSafeLink(a.url);
@@ -481,9 +481,10 @@ function renderNews(){
     return `<a class="news-article" href="${esc(url)}" target="_blank" rel="noopener noreferrer nofollow">
       <span class="news-article-title">${esc(a.title||'ข่าว')}</span>
       <span class="news-article-meta">${esc(a.source||'แหล่งข่าว')} · ${thDate(a.publishedAt)}</span>
+      <span class="news-article-tipster">ที่มาของชุดเลข: ${esc(a.pickSource||a.source||'ไม่ระบุ')}${(a.featured||[]).length?' · เด่น '+(a.featured||[]).filter(x=>/^\d$/.test(String(x))).map(esc).join(' · '):''}</span>
       ${tags.length?`<span class="news-article-tags">${tags.map(x=>`<b>${esc(x)}</b>`).join('')}</span>`:''}
     </a>`;
-  }).join('') || `<div class="news-empty news-empty-block">${error?'ยังเชื่อมต่อแหล่งข่าวไม่ได้ แต่ระบบตรวจสลากยังทำงานตามปกติ':'ยังไม่มีบทความที่ระบบแยกเลขได้อย่างมั่นใจ'}</div>`;
+  }).join('') || `<div class="news-empty news-empty-block">${error?'ยังเชื่อมต่อแหล่งข่าวไม่ได้ แต่ระบบตรวจสลากยังทำงานตามปกติ':'ยังไม่พบเลข 2/3 ตัวที่บทความระบุชัดเจน (ไม่ใช้ตัวเลขจากวันที่หรือปี พ.ศ.)'}</div>`;
   const history=Array.isArray(n.history)?n.history:[];
   $('#newsAuditHistory').innerHTML=history.map(x=>{
     const two=x.hit2===true

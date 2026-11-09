@@ -5,16 +5,16 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="สถิติผลสลากย้อนหลัง ตรวจรางวัล และบันทึกการคาดการณ์แบบตรวจสอบย้อนหลังได้">
   <title>Lottery Insight · TheLegionZ</title>
-  <link rel="stylesheet" href="style.css?v=5.2">
-  <link rel="icon" href="assets/favicon.ico?v=5.2" sizes="any">
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=5.2">
-  <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png?v=5.2">
-  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=5.2">
+  <link rel="stylesheet" href="style.css?v=5.2.1">
+  <link rel="icon" href="assets/favicon.ico?v=5.2.1" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=5.2.1">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png?v=5.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=5.2.1">
 </head>
 <body>
   <div id="pageLoader" class="page-loader" aria-live="polite">
     <div class="loader-card">
-      <div class="loader-mark"><img src="assets/favicon-192.png?v=5.2" alt="" aria-hidden="true"></div>
+      <div class="loader-mark"><img src="assets/favicon-192.png?v=5.2.1" alt="" aria-hidden="true"></div>
       <div class="loader-spinner" aria-hidden="true"></div>
       <strong>กำลังโหลด Lottery Insight</strong>
       <span id="pageLoaderText">กำลังเชื่อมต่อข้อมูลล่าสุด...</span>
@@ -23,7 +23,7 @@
   <header class="topbar">
     <div class="container topbar-inner">
       <a class="brand brand-logo" href="#" aria-label="Lottery Insight">
-        <img src="assets/lottery-insight-logo.png?v=5.2" alt="Lottery Insight by TheLegionZ">
+        <img src="assets/lottery-insight-logo.png?v=5.2.1" alt="Lottery Insight by TheLegionZ">
       </a>
       <div class="header-actions">
         <a class="nav-link news-nav" href="#news">เลขดังจากข่าว</a>
@@ -332,7 +332,7 @@
         <div>
           <span class="label">News Intelligence · Experimental</span>
           <h2 id="newsTitle">เลขดังจากข่าว</h2>
-          <p class="news-intro">รวบรวมเลขที่ถูกกล่าวถึงในข่าว พร้อมแหล่งที่มา และบันทึกไว้เพื่อตรวจผลย้อนหลัง</p>
+          <p class="news-intro">แสดงเฉพาะชุดเลข 2 และ 3 ตัวที่บทความระบุชัดเจน พร้อมแหล่งที่มาและลิงก์ต้นฉบับ</p>
         </div>
         <span id="newsStatus" class="news-status">รอข้อมูลข่าว</span>
       </div>
@@ -345,11 +345,11 @@
       <div class="news-layout">
         <div class="news-trends">
           <div class="news-trend-panel">
-            <div class="news-subhead"><strong>เลขท้าย 2 ตัวที่เป็นข่าว</strong><small>ตามจำนวนแหล่งข่าวและการกล่าวถึง</small></div>
+            <div class="news-subhead"><strong>เลขท้าย 2 ตัวที่เป็นข่าว</strong><small>นับเฉพาะชุดเลขที่ยืนยันจากหัวข้อหรือตาราง</small></div>
             <div id="newsTop2" class="news-chips" aria-live="polite"><span class="news-empty">รอการรวบรวมข่าว</span></div>
           </div>
           <div class="news-trend-panel">
-            <div class="news-subhead"><strong>เลข 3 ตัวที่เป็นข่าว</strong><small>ไม่ใช่เลขที่ระบบทำนายผล</small></div>
+            <div class="news-subhead"><strong>เลข 3 ตัวที่เป็นข่าว</strong><small>ไม่คาดเดาเลขจากวันที่หรือเลขเด่น</small></div>
             <div id="newsTop3" class="news-chips"><span class="news-empty">รอการรวบรวมข่าว</span></div>
           </div>
           <div id="newsOverlap" class="news-overlap" hidden></div>
@@ -441,7 +441,7 @@
   </div>
 
   <div id="toast" class="toast"></div>
-  <script src="config.js?v=5.2"></script>
-  <script src="script.js?v=5.2"></script>
+  <script src="config.js?v=5.2.1"></script>
+  <script src="script.js?v=5.2.1"></script>
 </body>
 </html>
