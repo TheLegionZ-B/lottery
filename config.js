@@ -1,4 +1,6 @@
-// Lottery Insight v5.3.1. Set your deployed read-only Apps Script /exec URL.
+// Lottery Insight v5.3.2 — GitHub Pages configuration.
+// IMPORTANT: Paste the Web App URL from Apps Script > Deploy > Manage deployments.
+// It must end in /exec. This URL is public and must support read-only GET only.
 window.APP_CONFIG = {
-  DATA_URL: "https://script.google.com/macros/s/AKfycbyiDuuOi2l3GLyIqvf01Op23FaldyHNWB4mbraEy90MXbbJwd80OOZVOZ9bsYfn2W-T/exec"
+  DATA_URL: 'https://script.google.com/macros/s/AKfycbwGCyfLiVBlxiLW91QeZcXvXt3JkuTGSAb6v3JY2bmBo4yuGnKXVgtLWgzNHoVcpzwt/exec'  // Example: 'https://script.google.com/macros/s/AKfycb.../exec'
 };

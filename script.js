@@ -1,5 +1,105 @@
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const CFG=window.APP_CONFIG||{};
+
+// One configuration path for dashboard, prize checker and health check.
+// The value is public by design: it must be a read-only deployment URL.
+function getBackendUrl(){
+  const raw=String(CFG.DATA_URL||'').trim();
+  if(!raw)throw new Error('CONFIG_MISSING');
+  let url;
+  try{url=new URL(raw);}catch(_){throw new Error('CONFIG_INVALID');}
+  if(url.protocol!=='https:' && !['localhost','127.0.0.1'].includes(url.hostname))
+    throw new Error('CONFIG_INVALID');
+  if(url.hostname==='script.google.com'){
+    if(/\/dev\/?$/.test(url.pathname))throw new Error('CONFIG_DEV_URL');
+    if(!/\/macros\/s\/[^/]+\/exec\/?$/.test(url.pathname))throw new Error('CONFIG_INVALID');
+  }
+  url.hash='';
+  return url;
+}
+function buildBackendUrl(params={}){
+  const url=getBackendUrl();
+  Object.entries(params).forEach(([key,value])=>url.searchParams.set(key,String(value)));
+  return url.toString();
+}
+function connectionMessage(err){
+  const code=String(err?.message||err||'');
+  if(code==='CONFIG_MISSING')return {
+    title:'ยังไม่ได้ตั้งค่าเชื่อมต่อ Backend',
+    detail:'เปิด config.js ใน GitHub แล้วใส่ DATA_URL เป็น URL Web App ที่ลงท้ายด้วย /exec จากนั้น Commit ไฟล์อีกครั้ง'
+  };
+  if(code==='CONFIG_INVALID')return {
+    title:'DATA_URL ไม่ถูกต้อง',
+    detail:'ตรวจว่าใช้ URL Web App แบบ HTTPS ที่ Deploy แล้ว ไม่ใช่ลิงก์หน้าแก้ไข Google Apps Script'
+  };
+  if(code==='CONFIG_DEV_URL')return {
+    title:'กำลังใช้ URL /dev',
+    detail:'URL /dev ใช้ทดสอบเฉพาะผู้มีสิทธิ์แก้ไขสคริปต์ ให้เปลี่ยนเป็น /exec ของ Web App Deployment'
+  };
+  if(code==='FETCH_TIMEOUT')return {
+    title:'Backend ตอบกลับช้าเกินไป',
+    detail:'ลองโหลดอีกครั้ง ตรวจ Apps Script → Executions และเปิดลิงก์ตรวจ Backend ด้านล่าง'
+  };
+  if(code==='FETCH_FAILED')return {
+    title:'เบราว์เซอร์เข้าถึง Backend ไม่ได้',
+    detail:'ตรวจ URL /exec, สิทธิ์ Who has access: Anyone, Execute as: Me และดูว่า Browser บล็อกการเชื่อมต่อข้ามเว็บไซต์หรือไม่'
+  };
+  if(/^HTTP_401|^HTTP_403/.test(code))return {
+    title:'Backend ไม่อนุญาตให้เข้าถึง',
+    detail:'ตรวจการ Deploy Web App ให้ Execute as: Me และ Who has access: Anyone แล้ว Deploy เป็น New version'
+  };
+  if(/^HTTP_404/.test(code))return {
+    title:'ไม่พบ Backend Deployment',
+    detail:'ตรวจ DATA_URL ว่าเป็น /exec ของ Deployment ที่ยังใช้งานอยู่ และไม่ได้คัดลอก URL หน้า Editor'
+  };
+  if(code==='NON_JSON')return {
+    title:'Backend ไม่ได้ส่งข้อมูล JSON',
+    detail:'URL อาจเปิดหน้า Login, หน้า Error หรือเป็น Deployment ที่ไม่ถูกต้อง เปิดลิงก์ตรวจ Backend เพื่อยืนยัน'
+  };
+  if(code==='RENDER_FAILED')return {
+    title:'ข้อมูลส่งมาถึงแล้ว แต่หน้าเว็บแสดงผลไม่สำเร็จ',
+    detail:'Backend ติดต่อได้ปกติ ปัญหาอยู่ที่ JavaScript หน้าเว็บ กรุณาตรวจ Console (F12)'
+  };
+  if(code==='BAD_PAYLOAD')return {
+    title:'Backend ส่งข้อมูลไม่ครบ',
+    detail:'ตรวจว่า Frontend และ Apps Script เป็นชุดที่เข้ากันได้ และ Deploy Backend v5.3.2 เป็น New version แล้ว'
+  };
+  if(code.startsWith('API_'))return {
+    title:'Backend ตอบกลับว่ามีข้อผิดพลาด',
+    detail:'ลองเปิดลิงก์ตรวจ Backend หากต้องแก้ไขเพิ่มเติมให้ดู Apps Script → Executions / SystemLog'
+  };
+  return {
+    title:'ไม่สามารถแสดงข้อมูลได้',
+    detail:'พบข้อผิดพลาดในการประมวลผลหน้าเว็บ กรุณาดู Browser Console (F12) และ Apps Script → Executions'
+  };
+}
+function showConnectionError(err){
+  const box=$('#connectionAlert');
+  const message=connectionMessage(err);
+  $('#connectionAlertTitle').textContent=message.title;
+  $('#connectionAlertText').textContent=message.detail;
+  const health=$('#connectionHealthLink');
+  try{health.href=buildBackendUrl({mode:'health'});health.hidden=false;}
+  catch(_){health.removeAttribute('href');health.hidden=true;}
+  box.hidden=false;
+}
+function hideConnectionError(){const e=$('#connectionAlert');if(e)e.hidden=true;}
+async function requestBackend(params,acceptApiError=false){
+  const url=buildBackendUrl(params);
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),35000);
+  let response;
+  try{response=await fetch(url,{cache:'no-store',signal:controller.signal});}
+  catch(err){throw new Error(err?.name==='AbortError'?'FETCH_TIMEOUT':'FETCH_FAILED');}
+  finally{clearTimeout(timer);}
+  if(!response.ok)throw new Error('HTTP_'+response.status);
+  let body;
+  try{body=await response.json();}catch(_){throw new Error('NON_JSON');}
+  if(!body || typeof body!=='object' || Array.isArray(body))throw new Error('BAD_PAYLOAD');
+  if(body.ok!==true && !acceptApiError)throw new Error('API_'+String(body.code||'ERROR'));
+  return body;
+}
+
 let state={results:[],predictions:[],currentPrediction:null,predictions6:[],currentPrediction6:null,latestPrizeSummary:null,algorithmPerformance:null,news:null,lastSync:"",source:"",range:50};
 
 function toast(m){const e=$("#toast");e.textContent=m;e.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("show"),2000)}
@@ -24,19 +124,29 @@ function hydrate(data){
 function setLoaderText(text){const e=$("#pageLoaderText");if(e)e.textContent=text}
 function hidePageLoader(){const e=$("#pageLoader");if(!e)return;e.classList.add("is-hidden");setTimeout(()=>{e.style.display="none"},330)}
 async function load(initial=false){
-  $("#statusText").textContent="กำลังโหลด";
-  if(initial)setLoaderText("กำลังเชื่อมต่อข้อมูลล่าสุด...");
+  $('#statusText').textContent='กำลังโหลด';
+  if(initial)setLoaderText('กำลังเชื่อมต่อข้อมูลล่าสุด...');
   try{
-    let data;
-    if(CFG.DATA_URL){
-      if(initial)setLoaderText("กำลังอ่านผลสลากและสถิติ...");
-      const r=await fetch(CFG.DATA_URL+"?mode=dashboard&t="+Date.now(),{cache:"no-store"});
-      if(!r.ok)throw new Error("HTTP "+r.status);
-      data=await r.json();if(!data.ok)throw new Error(data.error||"API error");
-    }else{throw new Error("ยังไม่ได้กำหนด DATA_URL สำหรับเชื่อม Backend จริง")}
-    hydrate(data);render();$("#statusText").textContent="อัปเดตอัตโนมัติ";
-  }catch(err){console.error(err);$("#statusText").textContent="เชื่อมต่อไม่ได้";toast("เชื่อมต่อข้อมูลไม่สำเร็จ")}
-  finally{if(initial)setTimeout(hidePageLoader,180)}
+    const data=await requestBackend({mode:'dashboard',t:Date.now()});
+    if(!Array.isArray(data.results)||!Array.isArray(data.predictions)||!Array.isArray(data.predictions6))
+      throw new Error('BAD_PAYLOAD');
+    try{
+      hydrate(data);
+      render();
+    }catch(renderErr){
+      console.error('Rendering error:',renderErr);
+      throw new Error('RENDER_FAILED');
+    }
+    hideConnectionError();
+    $('#statusText').textContent='อัปเดตอัตโนมัติ';
+  }catch(err){
+    console.error('Lottery Insight load:',err);
+    $('#statusText').textContent='เชื่อมต่อไม่ได้';
+    showConnectionError(err);
+    toast('ไม่สามารถโหลดข้อมูลล่าสุด');
+  }finally{
+    if(initial)setTimeout(hidePageLoader,180);
+  }
 }
 function dataRange(){return state.range==="all"?state.results:state.results.slice(0,Math.min(Number(state.range),state.results.length))}
 function renderPrizeNumbers(target,numbers,length){
@@ -457,17 +567,13 @@ function initTicketRows(){
 }
 
 async function requestCheckMany(numbers,date){
-  if(!CFG.DATA_URL)throw new Error('Missing Backend DATA_URL');
-  const u=new URL(CFG.DATA_URL);
-  u.searchParams.set('mode','check-many');
-  u.searchParams.set('drawDate',date);
-  u.searchParams.set('numbers',numbers.join(','));
-  u.searchParams.set('t',Date.now());
-  const r=await fetch(u.toString(),{cache:'no-store'});
-  if(!r.ok)throw new Error('HTTP '+r.status);
-  return await r.json();
+  return await requestBackend({
+    mode:'check-many',
+    drawDate:date,
+    numbers:numbers.join(','),
+    t:Date.now()
+  },true);
 }
-
 function prizeAmountForMatches(matches){
   return (matches||[]).reduce((sum,m)=>{
     const n=Number(m.amount);
@@ -601,9 +707,10 @@ async function checkPrize(){
       openResultModal("miss","ไม่พบเลขที่ถูกรางวัล","",date,summary.html);
     }
   }catch(e){
-    console.error(e);
-    openResultModal("error","เชื่อมต่อระบบตรวจรางวัลไม่ได้","",date,
-      '<div class="result-modal-message">กรุณาลองใหม่อีกครั้งภายหลัง</div>');
+    console.error('Prize checker:',e);
+    const details=connectionMessage(e);
+    openResultModal("error","ตรวจรางวัลไม่สำเร็จ","",date,
+      `<div class="result-modal-message">${esc(details.title)} · ${esc(details.detail)}</div>`);
   }finally{
     btn.disabled=false;
     btn.textContent=old;
@@ -641,4 +748,5 @@ $("#resultModalOk").onclick=closeResultModal;
 $("#resultModal").onclick=e=>{if(e.target===$("#resultModal"))closeResultModal()};
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#resultModal").hidden)closeResultModal()});
 
+$('#retryConnectionBtn').onclick=()=>load(false);
 initTicketRows();applyTheme(localStorage.getItem("lottery-theme")||"light");load(true);

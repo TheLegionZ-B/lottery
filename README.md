@@ -1,64 +1,80 @@
-# Lottery Insight v5.3.1 — News Publisher Parser Hotfix
+# Lottery Insight v5.3.2 — Connection Fix & Code Audit
 
-แก้ Error:
+รุ่นนี้แก้ปัญหาเว็บไซต์ GitHub Pages แสดง **“เชื่อมต่อไม่ได้”** โดยรักษา Algorithm v3, Prediction 6 หลัก, Prize Checker, LotteryChecks Auto News, History และ UI เดิมไว้
 
-```
-Error: Publisher response is not a Thai-government lucky-picks page
-newsParsePublisherPage_ (LotteryV2.gs)
-```
+## สาเหตุที่ตรวจพบจากแพ็กเกจเดิม
 
-## สาเหตุที่ตรวจพบจาก Code.gs v5.3.0
+1. `config.js` ใน GitHub Pages v5.3.0 ที่แจกไว้มี `DATA_URL: ''` ตั้งต้น หากอัปโหลดไฟล์ทับตัวที่ตั้งค่าแล้ว เว็บไม่มี URL ให้เรียก Backend
+2. `load()` แสดง “เชื่อมต่อไม่ได้” แม้บางกรณีเป็น JavaScript render error หรือ Backend ตอบกลับ HTML ไม่ใช่ JSON
+3. สร้าง endpoint dashboard เดิมด้วยการต่อ string `DATA_URL + '?mode=...'` ไม่รองรับ URL ที่มี query string อยู่ก่อน
+4. `CacheService.put()` สำหรับ Dashboard ไม่ได้ป้องกันเพดาน **100 KB ต่อรายการ** ของ Apps Script; หาก JSON โตมาก API อาจล้มและส่งเพียง `Service unavailable`
+5. `doGet()` ซ่อน Exception ทั้งหมดโดยไม่ได้เขียนรายละเอียดลง `SystemLog` ทำให้วินิจฉัยยาก
 
-ฟังก์ชัน `newsParsePublisherPage_()` ใช้ regex แบบตรงตัว (`เลขเด็ดหวยรัฐบาล`) กับข้อความที่ดึงจาก **120,000 ตัวอักษรแรกของ HTML** เท่านั้น ทำให้มีโอกาสปฏิเสธหน้าเว็บที่ถูกต้องถ้า HTML ส่วนหัวใหญ่หรือข้อความมีตัวคั่น/ช่องว่าง แม้หน้าเว็บสาธารณะจะมีเนื้อหาข่าวจริง
+## v5.3.2 แก้อะไร
 
-ยังมีสาเหตุอื่นที่เป็นไปได้ เช่น เว็บต้นทางส่งหน้า Cloudflare/Access Denied แทนหน้าเนื้อหา ไม่อาจตัดสินจาก Error เดิมเพียงอย่างเดียวได้
+### Frontend
+- แสดงกล่องแจ้งปัญหาแบบแยกสาเหตุ: ไม่มี URL, URL ผิด, `/dev`, 403, 404, HTML/Login, API error, render error และ Timeout
+- ปุ่ม **ลองอีกครั้ง** และ **ตรวจสอบ Backend** (`?mode=health`)
+- ประกอบ URL ด้วย `URL.searchParams` ทั้ง Dashboard และตรวจรางวัล
+- แยก API error จาก render error
+- เก็บรายละเอียด error ใน Browser Console (F12)
+- อัปเดต cache buster เป็น `v5.3.2`
+- ไม่มี Demo/Dummy fallback
 
-## สิ่งที่แก้
+### Backend
+- เพิ่ม `GET ?mode=health` สำหรับเช็กเวอร์ชัน, การตั้งค่า Spreadsheet และชื่อชีตที่จำเป็น (ไม่มีการเปิดเผย Spreadsheet ID)
+- เพิ่ม `backendVersion: "5.3.2"` ใน Dashboard
+- ข้ามการเก็บ Cache หาก JSON เกิน 85 KB เพื่อไม่ให้ Cache ทำระบบหลักล้ม และจัดการ error จาก Cache อย่างปลอดภัย
+- บันทึก `doGet` error เข้า Apps Script Executions / `SystemLog` (ฝั่งเจ้าของเท่านั้น)
+- Cache version เปลี่ยนเป็น `dashboard-v532`
+- คง Parser v5.3.1, Auto News, Algorithm v3 และ Sheets เดิมทั้งหมด
 
-1. อ่าน title/H1 จาก **HTML เต็มที่ได้รับ** โดยไม่ตัดแค่ 120,000 ตัวอักษรแรก
-2. ตรวจว่ามี `เลขเด็ด`, `หวยรัฐบาล` และ **งวดเป้าหมายตรงกัน**; ยอมรับช่องว่าง/จุด/ตัวคั่นระหว่างคำ
-3. จำกัดการดึงเลขให้อยู่ใต้ H2 `สำนักแต่ละแห่งให้เลขอะไรไว้` และ H3 สำนักที่มีรายการ `สองตัว` / `สามตัว` ชัดเจนเท่านั้น
-4. ยังคงรักษาเลขศูนย์นำหน้า (`01`, `081`) และตัดชุดเลขที่ใหญ่ผิดปกติ
-5. ตรวจแยกหน้า Block/CAPTCHA; ไม่พยายามหลบเลี่ยงมาตรการป้องกันของผู้เผยแพร่
-6. เพิ่ม `newsInspectPublisherPage_()` สำหรับ diagnostic ภายใน
-7. ปรับ `probeLotteryNewsSource()` ให้ **คืนรายงานแทนการ throw ทันที** พร้อม `httpStatus`, `contentType`, `inspection.title`, `inspection.h1`, `inspection.correctHeading`, `inspection.sectionFound`, `inspection.h3Count`, `inspection.blocked` และ `reason`
-8. Backend cache version เปลี่ยนเป็น `dashboard-v531` และ Engine version เป็น `5.3.1`
+## อัปเดตแบบที่แนะนำ (ไม่ทับ config.js)
 
-## ติดตั้ง
+1. สำรอง `Code.gs` และ Google Sheet ก่อน
+2. ใช้ `Code.gs` ใน **private-backend.zip** แทนสคริปต์เดิมทั้งหมดใน **Apps Script project เดิม** แล้ว Save
+3. **Deploy → Manage deployments → Edit (รูปดินสอ) → Version: New version → Deploy**
+4. เปิด URL ที่ Deploy ใน Browser (แนะนำ Incognito):
+   ```
+   https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec?mode=health
+   ```
+   เมื่อพร้อมจะได้ประมาณ:
+   ```json
+   {"ok":true,"version":"5.3.2","service":"Lottery Insight","code":"READY","missingSheets":[],"newsSheetsReady":true}
+   ```
+5. อัปโหลดไฟล์จาก **github-pages-update-only.zip** ไปแทนไฟล์บน GitHub Pages โดย **คง `config.js` ที่ใส่ URL จริงไว้**
+6. ถ้า `config.js` เดิมเป็นค่าว่าง ให้เปิดแก้ใน GitHub เป็น:
+   ```js
+   window.APP_CONFIG = {
+     DATA_URL: 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec'
+   };
+   ```
+   อย่าใส่ URL `/dev` หรือ URL หน้า Edit ของ Apps Script
+7. `Ctrl + F5` หรือเปิด Incognito เพื่อโหลด JS ใหม่
 
-1. **สำรอง** `Code.gs` และ Google Sheet
-2. นำ `Code.gs` จากแพ็กเกจนี้ไปแทน Backend v5.3.0 **ทั้งหมด** (ไฟล์นี้เป็น Backend เต็ม ไม่ใช่ patch บางส่วน)
-3. Save แล้วรัน **`probeLotteryNewsSource()`** ก่อน — ไม่เขียน Sheet
-4. ดูใน Execution Log:
+### ใช้ ZIP แบบ Full GitHub Pages
 
-```json
-{
-  "version": "5.3.1",
-  "ok": true,
-  "httpStatus": 200,
-  "inspection": {
-    "correctHeading": true,
-    "sectionFound": true,
-    "blocked": false
-  },
-  "groupCount": 4
-}
-```
+ไฟล์ **github-pages-full.zip** มี `config.js` ที่ตั้งว่างไว้เพื่อไม่เผยแพร่ URL ของคุณ ต้องใส่ URL เองทุกครั้งก่อนอัปโหลด ทั้งนี้ **ห้ามวาง Password/Private Key ใน `config.js`**
 
-ตัวเลข `groupCount: 4` เป็นเพียงตัวอย่าง ผลจริงเปลี่ยนตามหน้าเว็บ
+## วิธีแปลผล Health Check
 
-5. ถ้า `ok:true` ให้รัน **`syncLotteryNews()`** แล้ว **`diagnoseLotteryNews()`** และตรวจชีต `NewsArticles`
-6. เมื่อสำเร็จ จึง **Deploy > Manage deployments > Edit > New version > Deploy** เพื่อให้หน้าเว็บใช้ Backend รุ่นล่าสุด
-7. **ไม่ต้องแก้ GitHub Pages** และ **ไม่ต้องลบ Sheet**
+| ค่าที่ได้ | ความหมาย | การแก้ไข |
+|---|---|---|
+| `ok:true`, `code:READY` | Backend เชื่อม Spreadsheet หลักได้ | เปิด `?mode=dashboard` ต่อ แล้วตรวจ GitHub Config |
+| `code:SETUP_REQUIRED` | ยังไม่ได้บันทึก Spreadsheet ID ใน Script Properties | Run `setupSystem()` จาก Apps Script ที่ผูกกับ Sheet (หรือยืนยันว่ากำลังแก้ Script Project เดิม) |
+| `code:MISSING_SHEETS` | Sheet หลักบางตัวไม่มี | สำรองข้อมูลก่อนแล้วตรวจชื่อชีตที่หาย |
+| `code:SPREADSHEET_ACCESS_ERROR` | Backend เปิด Sheet ไม่ได้ | ตรวจสิทธิ์ Execute as: Me และการอนุญาต Apps Script |
+| หน้า Google Login/HTML แทน JSON | ไม่ได้เข้าถึง Web App ที่เปิดสาธารณะ | ตั้ง Execute as: Me, Who has access: Anyone และ Deploy New version |
+| `?mode=health` ตอบ Dashboard รุ่นเก่า | Deployment ยังเป็นโค้ดรุ่นก่อน | Manage deployments → Edit → New version |
+| `?mode=dashboard` ได้ `{ok:false,code:"BACKEND_ERROR"}` | Error ฝั่ง Backend จริง | ดู Apps Script → Executions และ `SystemLog` |
+| Health READY แต่เว็บยังขึ้น Error | `config.js` GitHub ชี้ผิด/Cache/CORS/Render | เปิด `https://<site>/config.js` และกด F12 → Network/Console |
 
-## ถ้า Probe ยังไม่ผ่าน
+> ถ้ามีข้อมูล Sheet และ Script Properties เดิมอยู่แล้ว **ไม่จำเป็นต้อง Run `setupSystem()` ทุกครั้งที่อัปเดต** การ Run อาจดึงและ backfill ข้อมูลซ้ำโดยไม่จำเป็น
 
-- `httpStatus` != 200: ปัญหาเครือข่าย/การเข้าถึงหน้า
-- `inspection.blocked: true`: ต้นทางส่งหน้า Block/Challenge — หยุด retry ถี่ ๆ; ต้องใช้ช่องทางที่ได้รับอนุญาตจากผู้ให้บริการ
-- `inspection.correctHeading: false`: เปรียบเทียบ `inspection.title`, `inspection.h1`, `inspection.visibleSample` ว่าได้หน้าอะไรมาจริง
-- `inspection.sectionFound: false`: หน้าแสดงหัวข้อหลัก แต่ไม่มีตารางเลขตามสำนักใน HTML ตอบกลับ อาจเปลี่ยน layout หรือโหลดด้วย JavaScript
-- `inspection.sectionFound: true` แต่ `ok:false`: รายการเลขใน HTML อาจเปลี่ยนรูปแบบ; ดู `reason`
+## ข้อจำกัดที่ต้องระบุ
 
-**ข้อจำกัด:** การทดสอบ 12/12 เป็น unit/regression test โดยใช้ HTML จำลองเพื่อทดสอบ Parser ไม่ได้ทดสอบ `UrlFetchApp` จริงในบัญชี Google Apps Script ของคุณ และไม่รับรองว่าจะ bypass การจำกัดเข้าถึงของผู้เผยแพร่ได้
+การตรวจครั้งนี้ทำจาก **ไฟล์ v5.3.0 GitHub Pages และ Code.gs v5.3.1 ที่เคยส่งให้** ไม่ใช่การเข้าถึง GitHub Repository หรือ Deployment จริงของคุณ เพราะยังไม่มี URL ของเว็บไซต์/Deployment ในแชต การทดสอบ Backend ทำด้วย Google Apps Script mocks และ Browser จำลอง API response; จึงยังไม่ยืนยันสภาพแวดล้อมเครือข่าย/CORS/สิทธิ์จริงในบัญชีคุณ
 
-โปรดปฏิบัติตามเงื่อนไขการเข้าถึงและเผยแพร่ข้อมูลจาก LotteryChecks และใส่เครดิต/ลิงก์ต้นทางตามเดิม
+## Security
+
+`?mode=health` เปิดเผยเฉพาะเวอร์ชันและสถานะพร้อมใช้ ไม่เผยแพร่ Spreadsheet ID, Script Properties หรือรายละเอียด Exception; `GET` ยังคงเป็น read-only โดยไม่เพิ่ม endpoint สำหรับ Sync หรือเขียนข้อมูลสาธารณะ

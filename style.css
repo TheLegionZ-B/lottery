@@ -1443,3 +1443,15 @@ body.dark .algorithm-edge.negative{background:#352715;color:#efc37e;border-color
 /* v5.2.2: honest diagnostics for missing verified news */
 .news-diagnostics{margin:8px 0 12px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--surface-soft);font-size:10px;color:var(--muted);line-height:1.6}
 .news-diagnostics[hidden]{display:none}
+
+
+/* v5.3.2: actionable connection error, only rendered on actual failure */
+#connectionAlert[hidden],#connectionHealthLink[hidden]{display:none!important}
+.connection-alert{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 18px;margin-top:14px;margin-bottom:6px;background:#fff7ed;border:1px solid #fed7aa;border-left:4px solid #ea580c;border-radius:14px;color:#7c2d12}
+.connection-alert strong{display:block;font-size:14px;margin-bottom:4px}
+.connection-alert p{font-size:12px;line-height:1.6;margin:0;color:#9a3412}
+.connection-alert-actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px;flex-shrink:0}
+.connection-alert-actions button,.connection-alert-actions a{background:white;border:1px solid #fdba74;border-radius:9px;padding:9px 12px;color:#9a3412;font:inherit;font-size:12px;font-weight:800;cursor:pointer;text-decoration:none}
+body.dark .connection-alert{background:#431407;border-color:#9a3412;color:#ffedd5}
+body.dark .connection-alert p{color:#fdba74}
+@media(max-width:700px){.connection-alert{flex-direction:column;align-items:stretch}.connection-alert-actions{flex-wrap:wrap}}
