@@ -452,11 +452,26 @@ function renderNews(){
   const waiting=n.status==='waiting-results';
   const empty=!(n.articleCount>0);
   const status=$('#newsStatus');
+  const diagEl=$('#newsDiagnostics');
+  if(diagEl){
+    const v=String(n.engineVersion||'');
+    const d=n.diagnostics||{};
+    const old=!v||v==='5.2'||v==='5.2.1';
+    const noData=empty&&!error&&n.enabled!==false;
+    diagEl.hidden=!(old||noData);
+    diagEl.textContent=old
+      ? 'Backend ข่าวเป็นรุ่นเก่า: ตรวจ DATA_URL แล้ว Deploy → New version'
+      : noData && d.reason==='configure-structured-source'
+      ? 'ยังไม่ได้ตั้งแหล่งข้อมูลเลขเด็ดแบบมีโครงสร้าง: เติมชีต NewsStructured หรือกำหนด JSON feed ใน Script Properties'
+      : noData
+      ? 'ไม่มีชุดเลขที่ผ่านการตรวจรูปแบบสำหรับงวดนี้: ดู diagnoseStructuredNews() ใน Apps Script'
+      : '';
+  }
   if(disabled){status.textContent='ปิดใช้งาน';status.className='news-status';}
   else if(error){status.textContent='แหล่งข่าวขัดข้อง';status.className='news-status warning';}
   else if(waiting){status.textContent='รอประกาศผลใหม่';status.className='news-status';}
   else if(empty){status.textContent='ยังไม่มีชุดเลขยืนยัน';status.className='news-status';}
-  else{status.textContent='รวบรวมอัตโนมัติ';status.className='news-status ready';}
+  else{status.textContent='ข้อมูลแยกหมวดแล้ว';status.className='news-status ready';}
   $('#newsPeriod').textContent=n.targetDrawDate
     ? 'ติดตามงวดประมาณ '+thDate(n.targetDrawDate)
     : 'รอข้อมูลรอบถัดไป';
@@ -484,7 +499,7 @@ function renderNews(){
       <span class="news-article-tipster">ที่มาของชุดเลข: ${esc(a.pickSource||a.source||'ไม่ระบุ')}${(a.featured||[]).length?' · เด่น '+(a.featured||[]).filter(x=>/^\d$/.test(String(x))).map(esc).join(' · '):''}</span>
       ${tags.length?`<span class="news-article-tags">${tags.map(x=>`<b>${esc(x)}</b>`).join('')}</span>`:''}
     </a>`;
-  }).join('') || `<div class="news-empty news-empty-block">${error?'ยังเชื่อมต่อแหล่งข่าวไม่ได้ แต่ระบบตรวจสลากยังทำงานตามปกติ':'ยังไม่พบเลข 2/3 ตัวที่บทความระบุชัดเจน (ไม่ใช้ตัวเลขจากวันที่หรือปี พ.ศ.)'}</div>`;
+  }).join('') || `<div class="news-empty news-empty-block">${error?'ยังเชื่อมต่อแหล่งข่าวไม่ได้ แต่ระบบตรวจสลากยังทำงานตามปกติ':'ยังไม่มีเลข 2/3 ตัวจากข้อมูลที่แยกหมวดแล้ว (เพิ่มใน NewsStructured หรือกำหนด Structured JSON feed)'}</div>`;
   const history=Array.isArray(n.history)?n.history:[];
   $('#newsAuditHistory').innerHTML=history.map(x=>{
     const two=x.hit2===true

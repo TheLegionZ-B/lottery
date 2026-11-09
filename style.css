@@ -1439,3 +1439,7 @@ body.dark .algorithm-edge.negative{background:#352715;color:#efc37e;border-color
 
 /* News v5.2.1 — separate publisher from original pick source */
 .news-article-tipster{font-size:10px;color:var(--green);font-weight:700;line-height:1.5;display:block}
+
+/* v5.2.2: honest diagnostics for missing verified news */
+.news-diagnostics{margin:8px 0 12px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--surface-soft);font-size:10px;color:var(--muted);line-height:1.6}
+.news-diagnostics[hidden]{display:none}
