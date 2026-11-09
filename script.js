@@ -1,6 +1,6 @@
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const CFG=window.APP_CONFIG||{};
-let state={results:[],predictions:[],currentPrediction:null,predictions6:[],currentPrediction6:null,latestPrizeSummary:null,algorithmPerformance:null,lastSync:"",source:"",range:50};
+let state={results:[],predictions:[],currentPrediction:null,predictions6:[],currentPrediction6:null,latestPrizeSummary:null,algorithmPerformance:null,news:null,lastSync:"",source:"",range:50};
 
 const DEMO={
   ok:true,source:"Demo data",lastSync:new Date().toISOString(),
@@ -41,6 +41,7 @@ function hydrate(data){
   state.currentPrediction6=data.currentPrediction6||null;
   state.latestPrizeSummary=data.latestPrizeSummary||null;
   state.algorithmPerformance=data.algorithmPerformance||null;
+  state.news=data.news||null;
   state.lastSync=data.lastSync||"";
   state.source=data.source||"";
 }
@@ -429,6 +430,81 @@ function renderAlgorithmPerformance(){
   }).join("")||'<tr><td colspan="4">ไม่มีข้อมูล Model</td></tr>';
 }
 
+/* ===== v5.2 News Intelligence (read-only) ===== */
+function newsSafeLink(url){
+  const str=String(url||'').trim();
+  return /^https:\/\/[^<>"'\s]{4,1800}$/i.test(str)?str:'';
+}
+function newsNumberChips(items,maxLength){
+  if(!items?.length)return '<span class="news-empty">ยังไม่พบเลขที่กล่าวถึงชัดเจนในข่าว</span>';
+  return items.slice(0,5).filter(x=>
+    new RegExp('^\\d{'+maxLength+'}$').test(String(x.number||''))
+  ).map((x,i)=>`<div class="news-number-card">
+    <small>อันดับ ${i+1}</small>
+    <strong>${esc(x.number)}</strong>
+    <span>${Number(x.sourceCount||0)} แหล่ง · ${Number(x.mentions||0)} ข่าว</span>
+  </div>`).join('')||'<span class="news-empty">ยังไม่มีเลขที่ผ่านการตรวจสอบ</span>';
+}
+function renderNews(){
+  const n=state.news||{};
+  const disabled=n.enabled===false;
+  const error=n.status==='error';
+  const waiting=n.status==='waiting-results';
+  const empty=!(n.articleCount>0);
+  const status=$('#newsStatus');
+  if(disabled){status.textContent='ปิดใช้งาน';status.className='news-status';}
+  else if(error){status.textContent='แหล่งข่าวขัดข้อง';status.className='news-status warning';}
+  else if(waiting){status.textContent='รอประกาศผลใหม่';status.className='news-status';}
+  else if(empty){status.textContent='ยังไม่มีเลขจากข่าว';status.className='news-status';}
+  else{status.textContent='รวบรวมอัตโนมัติ';status.className='news-status ready';}
+  $('#newsPeriod').textContent=n.targetDrawDate
+    ? 'ติดตามงวดประมาณ '+thDate(n.targetDrawDate)
+    : 'รอข้อมูลรอบถัดไป';
+  $('#newsLastSync').textContent=n.lastSync
+    ? 'อัปเดตข่าว '+thDateTime(n.lastSync)
+    : 'ยังไม่มีข้อมูลอัปเดต';
+  $('#newsTop2').innerHTML=newsNumberChips(n.top2,2);
+  $('#newsTop3').innerHTML=newsNumberChips(n.top3,3);
+  const overlaps=Array.isArray(n.overlap2)?n.overlap2.filter(x=>/^\d{2}$/.test(x)):[];
+  const ov=$('#newsOverlap');
+  ov.hidden=!overlaps.length;
+  ov.textContent=overlaps.length
+    ? 'เลขที่ตรงกันระหว่างข่าวกับ Candidate ของ Algorithm: '+overlaps.join(' · ')
+    : '';
+  $('#newsArticleCount').textContent=`${Number(n.articleCount||0)} ข่าว · ${Number(n.sourceCount||0)} แหล่ง`;
+  const articles=Array.isArray(n.articles)?n.articles:[];
+  $('#newsArticles').innerHTML=articles.map(a=>{
+    const url=newsSafeLink(a.url);
+    if(!url)return '';
+    const tags=[...(a.two||[]),...(a.three||[])]
+      .filter(x=>/^\d{2,3}$/.test(String(x))).slice(0,8);
+    return `<a class="news-article" href="${esc(url)}" target="_blank" rel="noopener noreferrer nofollow">
+      <span class="news-article-title">${esc(a.title||'ข่าว')}</span>
+      <span class="news-article-meta">${esc(a.source||'แหล่งข่าว')} · ${thDate(a.publishedAt)}</span>
+      ${tags.length?`<span class="news-article-tags">${tags.map(x=>`<b>${esc(x)}</b>`).join('')}</span>`:''}
+    </a>`;
+  }).join('') || `<div class="news-empty news-empty-block">${error?'ยังเชื่อมต่อแหล่งข่าวไม่ได้ แต่ระบบตรวจสลากยังทำงานตามปกติ':'ยังไม่มีบทความที่ระบบแยกเลขได้อย่างมั่นใจ'}</div>`;
+  const history=Array.isArray(n.history)?n.history:[];
+  $('#newsAuditHistory').innerHTML=history.map(x=>{
+    const two=x.hit2===true
+      ? '<span class="history-status hit">ถูกรางวัล</span>'
+      : '<span class="history-status miss">ไม่ตรง</span>';
+    const three=x.hit3===null
+      ? '<span class="news-unknown">ข้อมูลไม่ครบ</span>'
+      : x.hit3===true
+      ? `<span class="history-status hit">ตรง ${esc((x.matches||[]).join(' · '))}</span>`
+      : '<span class="history-status miss">ไม่ตรง</span>';
+    return `<tr class="${x.hit2||x.hit3?'history-hit':'history-miss'}">
+      <td>${thDate(x.actualDrawDate)}</td>
+      <td>${esc((x.candidates2||[]).join(' · ')||'—')}</td>
+      <td><b class="two-no">${esc(x.actualLast2||'—')}</b></td>
+      <td>${two}</td>
+      <td>${three}</td>
+    </tr>`;
+  }).join('')||'<tr><td colspan="5">ยังไม่มี Snapshot ข่าวที่ตรวจผลแล้ว</td></tr>';
+}
+
+
 function statCounts(){const map=new Map(),digits=Array(10).fill(0);dataRange().forEach(d=>{if(!/^\d{2}$/.test(d.last2))return;map.set(d.last2,(map.get(d.last2)||0)+1);digits[+d.last2[0]]++;digits[+d.last2[1]]++});return{freq:[...map].map(([number,count])=>({number,count})),digits}}
 function renderStats(){const{freq,digits}=statCounts(),hot=[...freq].sort((a,b)=>b.count-a.count||a.number.localeCompare(b.number)).slice(0,5),cold=[...freq].sort((a,b)=>a.count-b.count||a.number.localeCompare(b.number)).slice(0,5),chips=a=>a.map(x=>`<div class="num-chip"><strong>${x.number}</strong><span>${x.count} ครั้ง</span></div>`).join("");$("#hotNumbers").innerHTML=chips(hot);$("#coldNumbers").innerHTML=chips(cold);const max=Math.max(1,...digits);$("#digitChart").innerHTML=digits.map((v,i)=>`<div class="digit-col"><div class="digit-bar" data-value="${v}" style="height:${Math.max(4,v/max*86)}%"></div><b>${i}</b></div>`).join("")}
 function renderHistory(){$("#historyCount").textContent=`(${state.results.length} งวด)`;$("#historyBody").innerHTML=state.results.slice(0,100).map(d=>`<tr><td>${thDate(d.drawDate)}</td><td><span class="main-no">${esc(d.firstPrize)}</span></td><td><span class="two-no">${esc(d.last2)}</span></td></tr>`).join("")||`<tr><td colspan="3">ไม่มีข้อมูล</td></tr>`}
@@ -442,7 +518,7 @@ function renderDrawOptions(){
   else if(state.results[0]?.drawDate) select.value=state.results[0].drawDate;
 }
 
-function render(){renderLatest();renderPrediction();renderAudit();renderAudit6();renderAlgorithmPerformance();renderStats();renderHistory();renderDrawOptions()}
+function render(){renderLatest();renderPrediction();renderAudit();renderAudit6();renderAlgorithmPerformance();renderNews();renderStats();renderHistory();renderDrawOptions()}
 
 /* =========================
    Prize checker + animated modal

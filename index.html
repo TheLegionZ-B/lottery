@@ -5,16 +5,16 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="สถิติผลสลากย้อนหลัง ตรวจรางวัล และบันทึกการคาดการณ์แบบตรวจสอบย้อนหลังได้">
   <title>Lottery Insight · TheLegionZ</title>
-  <link rel="stylesheet" href="style.css?v=5.1.1">
-  <link rel="icon" href="assets/favicon.ico?v=5.1.1" sizes="any">
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=5.1.1">
-  <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png?v=5.1.1">
-  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=5.1.1">
+  <link rel="stylesheet" href="style.css?v=5.2">
+  <link rel="icon" href="assets/favicon.ico?v=5.2" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=5.2">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png?v=5.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=5.2">
 </head>
 <body>
   <div id="pageLoader" class="page-loader" aria-live="polite">
     <div class="loader-card">
-      <div class="loader-mark"><img src="assets/favicon-192.png?v=5.1.1" alt="" aria-hidden="true"></div>
+      <div class="loader-mark"><img src="assets/favicon-192.png?v=5.2" alt="" aria-hidden="true"></div>
       <div class="loader-spinner" aria-hidden="true"></div>
       <strong>กำลังโหลด Lottery Insight</strong>
       <span id="pageLoaderText">กำลังเชื่อมต่อข้อมูลล่าสุด...</span>
@@ -23,9 +23,10 @@
   <header class="topbar">
     <div class="container topbar-inner">
       <a class="brand brand-logo" href="#" aria-label="Lottery Insight">
-        <img src="assets/lottery-insight-logo.png?v=5.1.1" alt="Lottery Insight by TheLegionZ">
+        <img src="assets/lottery-insight-logo.png?v=5.2" alt="Lottery Insight by TheLegionZ">
       </a>
       <div class="header-actions">
+        <a class="nav-link news-nav" href="#news">เลขดังจากข่าว</a>
         <a class="nav-link" href="#check">ตรวจรางวัล</a>
         <span id="statusPill" class="status-pill"><i></i><span id="statusText">กำลังโหลด</span></span>
         <button id="themeBtn" class="icon-btn" aria-label="เปลี่ยน Theme">🌙</button>
@@ -326,6 +327,52 @@
       </details>
     </section>
 
+    <section class="card news-card" id="news" aria-labelledby="newsTitle">
+      <div class="section-head news-head">
+        <div>
+          <span class="label">News Intelligence · Experimental</span>
+          <h2 id="newsTitle">เลขดังจากข่าว</h2>
+          <p class="news-intro">รวบรวมเลขที่ถูกกล่าวถึงในข่าว พร้อมแหล่งที่มา และบันทึกไว้เพื่อตรวจผลย้อนหลัง</p>
+        </div>
+        <span id="newsStatus" class="news-status">รอข้อมูลข่าว</span>
+      </div>
+
+      <div class="news-meta">
+        <span id="newsPeriod">งวดที่ติดตาม —</span>
+        <span id="newsLastSync">ยังไม่มีข้อมูลอัปเดต</span>
+      </div>
+
+      <div class="news-layout">
+        <div class="news-trends">
+          <div class="news-trend-panel">
+            <div class="news-subhead"><strong>เลขท้าย 2 ตัวที่เป็นข่าว</strong><small>ตามจำนวนแหล่งข่าวและการกล่าวถึง</small></div>
+            <div id="newsTop2" class="news-chips" aria-live="polite"><span class="news-empty">รอการรวบรวมข่าว</span></div>
+          </div>
+          <div class="news-trend-panel">
+            <div class="news-subhead"><strong>เลข 3 ตัวที่เป็นข่าว</strong><small>ไม่ใช่เลขที่ระบบทำนายผล</small></div>
+            <div id="newsTop3" class="news-chips"><span class="news-empty">รอการรวบรวมข่าว</span></div>
+          </div>
+          <div id="newsOverlap" class="news-overlap" hidden></div>
+          <div class="news-disclaimer">ความนิยมของเลขในข่าว <b>ไม่ใช่ความน่าจะเป็นที่จะถูกรางวัล</b> ระบบจะแยกข่าวออกจาก Algorithm หลักจนกว่าจะมีหลักฐานจากการทดสอบย้อนหลังเพียงพอ</div>
+        </div>
+        <div class="news-source-panel">
+          <div class="news-subhead"><strong>ข่าวที่ตรวจพบ</strong><small id="newsArticleCount">0 ข่าว</small></div>
+          <div id="newsArticles" class="news-articles"><p class="news-empty">ยังไม่มีข่าวที่ผ่านเกณฑ์การแยกเลข</p></div>
+        </div>
+      </div>
+
+      <details class="news-audit-details">
+        <summary>ผลตรวจเลขดังจากข่าวย้อนหลัง</summary>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>งวดที่ตรวจ</th><th>เลข 2 ตัวจากข่าว</th><th>ผลจริง</th><th>ผลตรวจ 2 ตัว</th><th>ตรวจเลข 3 ตัว</th></tr></thead>
+            <tbody id="newsAuditHistory"><tr><td colspan="5">ยังไม่มี Snapshot ที่ตรวจผลแล้ว</td></tr></tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+
+
     <section class="section">
       <div class="section-head responsive-head">
         <div>
@@ -394,7 +441,7 @@
   </div>
 
   <div id="toast" class="toast"></div>
-  <script src="config.js?v=5.1.1"></script>
-  <script src="script.js?v=5.1.1"></script>
+  <script src="config.js?v=5.2"></script>
+  <script src="script.js?v=5.2"></script>
 </body>
 </html>
