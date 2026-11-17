@@ -1,6 +1,6 @@
-# Lottery Insight v5.4.3 — Warm Edition + Visual Algorithm Lab
+# Lottery Insight v5.4.5 — Warm Edition + Full-window Comparison
 
-![Frontend](https://img.shields.io/badge/Frontend-v5.4.3-A15132)
+![Frontend](https://img.shields.io/badge/Frontend-v5.4.5-A15132)
 ![Backend](https://img.shields.io/badge/Backend-v5.3.2-795548)
 ![Hosting](https://img.shields.io/badge/Hosting-GitHub%20Pages-24292f)
 
@@ -10,6 +10,54 @@ Lottery Insight เป็นเว็บไซต์สำหรับดูผ�
 
 > [!IMPORTANT]
 > เว็บไซต์นี้จัดทำเพื่อการศึกษาและทดลองสถิติ ไม่ใช่คำแนะนำในการซื้อสลาก คะแนน Stat score เป็นคะแนนจัดอันดับ ไม่ใช่ความน่าจะเป็นในการถูกรางวัล ผลย้อนหลังและเลขดังจากข่าวไม่สามารถรับประกันผลในอนาคตได้ ผลรางวัลทางการให้ยึด [สำนักงานสลากกินแบ่งรัฐบาล (GLO)](https://www.glo.or.th/mission/reward-payment/check-reward) เป็นหลัก
+
+## What's new — v5.4.5 / Labs UI 0.2.3
+
+- Algorithm Lab แสดงเฉพาะหมวดที่ทั้งสูตรเดิมและสูตรทดลองทดสอบครบตามจำนวนงวดล่าสุดที่เลือก (20/40/60) ในช่วงเดียวกัน โดยไม่มีงวดที่ข้าม ไม่แสดงผลบางส่วนในกราฟ ตาราง หรือสรุป
+- ซ่อนรายงานความครบถ้วนและตารางข้อมูลรายงวดออกจาก UI เพื่อลดความสับสน แต่ยังตรวจความครบถ้วนภายใน Engine เดิม ไม่เปลี่ยนเกณฑ์ฝึกขั้นต่ำ 20 งวด
+- หมวดที่ข้อมูลครบในอนาคตจะกลับมาแสดงอัตโนมัติ; ผล 0% ที่ทดสอบครบยังแสดงตามจริง ไม่เลือกซ่อนตามอัตราที่ตรงรางวัล
+- หากไม่มีหมวดที่ผ่านเกณฑ์ จะแจ้งว่าไม่พบหมวดที่ทดสอบครบ และซ่อนกราฟ/ตารางทั้งหมด; เปลี่ยนจำนวนงวดแล้วล้างผลเดิมจนกดทดสอบใหม่
+- ไม่มีการแก้สูตร, ข้อมูลผลรางวัล, News Monitor, Backend หรือ Trigger
+
+### Upgrade from v5.4.4
+
+1. แตก `lottery-insight-v5.4.5-github-pages-update-only.zip` แล้วอัปโหลดไฟล์ทับบน GitHub ตามโครงสร้างเดิม
+2. เก็บ `config.js`, `labs/labs-config.js`, `style.css`, `script.js` และ `assets/` ไว้ ไม่ต้อง Deploy Apps Script ใหม่
+3. Ctrl+F5 แล้วเลือกจำนวนงวดใน Labs และกดทดสอบใหม่
+
+### Validation v5.4.5
+
+- ทดสอบการแสดงผลด้วย DOM จำลอง 10 กรณี: 60/40/20 งวด, ครบทุกหมวด, ไม่ครบทุกหมวด, ประวัติไม่พอ, จำนวนงวดสูตรต่างกัน, มีงวดที่ข้าม, ผลผิดรูปแบบ และล้างผลเมื่อเปลี่ยนจำนวนงวด
+- ตรวจ Syntax JavaScript และ HTML IDs; สูตร/Worker และ News Monitor เหมือน v5.4.4
+- ไม่ได้ทดสอบ Browser หรือ Deployment/Google Sheet จริง; ตัวเลขทดสอบเป็น fixture และไม่รวมอยู่ใน ZIP
+
+## Previous update — v5.4.4 / Labs UI 0.2.2
+
+- รายงานคุณภาพข้อมูล: จำนวนงวดที่เลือก / มีข้อมูลทั้งประวัติ / ทดสอบจริง / ผลรางวัลไม่ครบ / ข้อมูลฝึกไม่พอ / สูตรไม่พร้อม พร้อมรายละเอียดรายงวด
+- สาเหตุการข้ามนับแยกกันแบบไม่ซ้ำในช่วงที่เลือก โดยไม่ลดเกณฑ์ฝึก 20 งวด ไม่เปลี่ยนสูตรหรือเติมรางวัลที่ขาด
+- รวม LotteryChecks จาก Production กับ RANLOTTO และ GNews ในรายการข่าวและตัวกรองเดียว พร้อมการ์ดสถานะแยกแหล่ง, เวลาเก็บข้อมูลล่าสุด, รายละเอียด Request และสถานะพักการใช้งาน
+- LotteryChecks แสดงสถานะล่าสุดที่ระบบหลักรายงาน ไม่ใช่ live probe แยกแต่ละสำนัก; เวลาลอง Sync ของระบบหลักไม่อยู่ใน public API จึงไม่สร้างค่าขึ้นมาเอง
+- Labs Backend 0.1.4 เพิ่ม `labSyncAllNews()` สำหรับเจ้าของระบบลองดึงแหล่งทดลองทุกตัวหนึ่งรอบ; RANLOTTO ที่ยังปฏิเสธการเข้าถึงจะพักต่ออัตโนมัติ ไม่หลบข้อจำกัด; หากดึงข่าวสำเร็จจะเปิดการ Sync ตามรอบเดิม
+- GNews เว้น 2 วินาทีระหว่างคำค้น และแยกผลไม่พบข่าว/บาง Request ล้มเหลว/ล้มเหลวทั้งหมด โดยไม่ลบข่าวเดิม
+
+### Upgrade from v5.4.3
+
+1. สำรอง Code.gs ของ LotteryLabs จากนั้นแทนด้วยไฟล์ Code.gs ใน ZIP Backend 0.1.4 เท่านั้น (ไม่แตะ Production v5.3.2)
+2. Save แล้วรัน `labSyncAllNews()` หนึ่งครั้ง ตรวจ Execution Log; ไม่ต้อง Setup หรือ Install ใหม่ ถ้าเคยทำแล้ว
+3. Deploy → Manage deployments → Edit → New version → Deploy โดยใช้ deployment URL เดิม
+4. แตก ZIP Frontend v5.4.4 และอัปโหลดไฟล์ทับเดิม; ไม่ทับ config.js, labs/labs-config.js, style.css, script.js หรือ assets
+5. Ctrl+F5 แล้วเข้า Labs ทดสอบ 60 งวด และดูรายงานความครบถ้วน/สถานะแหล่งข่าว
+6. ปุ่มโหลดข้อมูลบนเว็บอ่านข้อมูลล่าสุดจากทั้งสอง Backend เท่านั้น ไม่สั่ง Sync หรือเรียกเว็บไซต์ผู้ให้บริการโดยตรง; หากต้องการอัปเดต LotteryChecks ให้ใช้ syncLotteryNews() ใน Production ตามวิธีเดิม
+
+รายงานไม่ได้เติมข้อมูลย้อนหลังหรือแก้ Google Sheet หลัก; Backfill เดิมของระบบหลักเก็บเฉพาะรางวัลที่ 1 และท้าย 2 สำหรับงวดเก่า จึงต้องยืนยันข้อมูลที่ขาดก่อนเพิ่มแหล่ง Backfill การทดสอบจำลอง 102 งวด (ครบ 22 งวดล่าสุด) ให้ผลหน้า/ท้าย 3: ขาด 38, ฝึกไม่พอ 20, ทดสอบ 2; ตรวจทุกรางวัล 22. ตัวเลขนี้เป็น fixture ไม่ใช่ผลตรวจชีตจริง
+
+### Validation v5.4.4
+
+- เปรียบเทียบผลหมวดทั้งห้ากับ Engine เดิม: ข้อมูลครบ 102 งวด, ข้อมูลครบเพียง 22 จาก 102, ประวัติสั้นกว่าเกณฑ์ฝึก, รางวัลรูปแบบผิด — ผ่าน 4 กรณี และผลสูตรเดิม/ใหม่ไม่เปลี่ยน
+- Backend mock 10/10, JavaScript syntax และการตรวจ HTML ID/JS selectors ผ่าน
+- Chromium เปิดหน้า localhost ไม่ได้ (ERR_BLOCKED_BY_ADMINISTRATOR); ยังไม่ยืนยัน UI จริง, Google Apps Script, GitHub Pages หรือสถานะของต้นทาง; ไม่มี fixture ในแพ็กเกจใช้งาน
+
+## Previous changelog
 
 ## What's new — v5.4.3
 
@@ -187,7 +235,7 @@ repository/
 
 ไม่ต้องแก้ Code.gs, Deploy Apps Script, แก้ Google Sheet หรือสร้าง Trigger ใหม่ หาก Backend เดิมทำงานอยู่แล้ว
 
-## Lottery Insight Labs — UI 0.2.1
+## Lottery Insight Labs — UI 0.2.3
 
 Labs เป็นพื้นที่ทดลองแยกจาก Production ใช้ API เดิม 3 โหมดเท่านั้น:
 
@@ -268,9 +316,9 @@ window.APP_CONFIG = {
 
 | Component | Version |
 |---|---|
-| Frontend | v5.4.3 — Warm Edition + Visual Algorithm Lab |
-| Labs UI | v0.2.1 — Visual Comparison |
-| Labs Backend | v0.1.3 — unchanged |
+| Frontend | v5.4.5 — Warm Edition + Full-window Comparison |
+| Labs UI | v0.2.3 — Full-window Comparison |
+| Labs Backend | v0.1.4 |
 | Backend | v5.3.2 — Connection Fix |
 | Prediction 2D | Algorithm v3 — Walk-forward Ensemble |
 | Prediction 6D | Algorithm v2 — Coverage + Diversity |
