@@ -9,7 +9,7 @@
   <link href="../assets/favicon-32.png?v=5.4.1" rel="icon" sizes="32x32" type="image/png">
   <link href="../assets/apple-touch-icon.png?v=5.4.1" rel="apple-touch-icon">
   <link href="../style.css?v=5.4.1" rel="stylesheet">
-  <link href="labs.css?v=0.2.0" rel="stylesheet">
+  <link href="labs.css?v=0.2.1" rel="stylesheet">
   <script src="theme.js?v=0.2.0"></script>
 </head>
 <body class="labs-page">
@@ -34,6 +34,7 @@
       <p class="status" id="status" role="status">เลือกจำนวนงวด แล้วกดทดสอบ</p>
       <p class="labs-muted" id="summary"></p>
       <div class="labs-results" id="resultOverview" hidden aria-live="polite"></div>
+      <section class="labs-comparison" id="comparison" hidden aria-labelledby="comparisonTitle"><div class="labs-comparison-head"><div><h3 id="comparisonTitle">อ่านผลทดสอบอย่างไร?</h3><p class="labs-muted">อัตรางวดที่ตรงรางวัล · เปรียบเทียบสูตรในแต่ละหมวด</p></div></div><div id="comparisonCards" class="labs-comparison-grid"></div><p class="labs-muted labs-comparison-note">กราฟแต่ละหมวดใช้สเกลร่วมกันภายในหมวดนั้น (อาจต่างกันระหว่างหมวด) · Baseline คือโอกาสตามทฤษฎีเมื่อสุ่ม 5 หมายเลขไม่ซ้ำ ไม่ใช่ผลทดลองสุ่มจริง</p></section>
       <div class="table-wrap labs-table" tabindex="0" role="region" aria-label="ตารางเปรียบเทียบผลทดสอบ เลื่อนแนวนอนได้"><table><thead><tr><th scope="col">หมวดรางวัล</th><th scope="col">สูตรเดิม / อ้างอิง</th><th scope="col">Multi-window Lab</th><th scope="col">Baseline สุ่ม*</th></tr></thead><tbody id="results"><tr><td colspan="4">ยังไม่ได้เริ่มทดสอบ</td></tr></tbody></table></div>
       <p class="labs-muted">* สูตรทั้งสองเลือก 5 หมายเลขต่อหมวดไม่ซ้ำกัน ผลย้อนหลังไม่ใช่การรับประกันผลในอนาคต จำนวนงวดที่ใช้ได้อาจต่ำกว่าที่เลือกเมื่อข้อมูลฝึกหรือผลรางวัลไม่ครบ</p>
     </article>
@@ -51,11 +52,11 @@
     <details class="card system-diagnostics labs-details"><summary>แหล่งข่าวและข้อจำกัด</summary><p><a href="https://lotterychecks.com/" target="_blank" rel="noopener noreferrer">LotteryChecks</a> · <a href="https://www.ranlotto.com/api-docs" target="_blank" rel="noopener noreferrer">RANLOTTO</a> · <a href="https://gnews.io/" target="_blank" rel="noopener noreferrer">GNews</a></p><p>แหล่งข่าวเพิ่มเติมยังอยู่ระหว่างการทดลอง หากไม่มีข่าว ระบบจะแสดงตามจริง ไม่เติมข้อมูลจำลอง โปรดตรวจต้นฉบับและวันที่ของข่าวก่อนนำไปใช้</p><p>ระบบ Labs แยก Apps Script และ Google Sheet จาก Production โดยอ่านผลสลากย้อนหลังผ่าน API เท่านั้น ไม่บันทึกเลขทดลองลง Snapshot จริง</p></details>
   </section>
 </main>
-<footer><div class="container footer-inner"><span>Lottery Insight · TheLegionZ · <a href="../index.html">หน้าหลัก</a></span><span>ผลทางการให้ยึดสำนักงานสลากกินแบ่งรัฐบาล</span><span class="site-version">Labs UI v0.2.0</span></div></footer>
+<footer><div class="container footer-inner"><span>Lottery Insight · TheLegionZ · <a href="../index.html">หน้าหลัก</a></span><span>ผลทางการให้ยึดสำนักงานสลากกินแบ่งรัฐบาล</span><span class="site-version">Labs UI v0.2.1</span></div></footer>
 <script src="../config.js"></script>
 <script src="labs-config.js"></script>
 <script src="common.js?v=0.2.0"></script>
-<script src="algorithm.js?v=0.2.0"></script>
+<script src="algorithm.js?v=0.2.1"></script>
 <script src="news.js?v=0.2.0"></script>
 </body>
 </html>
