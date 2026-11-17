@@ -1,6 +1,6 @@
-# Lottery Insight v5.4.2 — Warm Edition + Labs
+# Lottery Insight v5.4.3 — Warm Edition + Visual Algorithm Lab
 
-![Frontend](https://img.shields.io/badge/Frontend-v5.4.2-A15132)
+![Frontend](https://img.shields.io/badge/Frontend-v5.4.3-A15132)
 ![Backend](https://img.shields.io/badge/Backend-v5.3.2-795548)
 ![Hosting](https://img.shields.io/badge/Hosting-GitHub%20Pages-24292f)
 
@@ -10,6 +10,27 @@ Lottery Insight เป็นเว็บไซต์สำหรับดูผ�
 
 > [!IMPORTANT]
 > เว็บไซต์นี้จัดทำเพื่อการศึกษาและทดลองสถิติ ไม่ใช่คำแนะนำในการซื้อสลาก คะแนน Stat score เป็นคะแนนจัดอันดับ ไม่ใช่ความน่าจะเป็นในการถูกรางวัล ผลย้อนหลังและเลขดังจากข่าวไม่สามารถรับประกันผลในอนาคตได้ ผลรางวัลทางการให้ยึด [สำนักงานสลากกินแบ่งรัฐบาล (GLO)](https://www.glo.or.th/mission/reward-payment/check-reward) เป็นหลัก
+
+## What's new — v5.4.3
+
+- Labs UI v0.2.1 เพิ่มกราฟแท่งเปรียบเทียบผลย้อนหลังทั้ง 5 หมวด ร่วมกับตารางเดิม
+- แสดงสูตรเดิมหรือสูตรความถี่อ้างอิง, Multi-window Lab, จำนวนงวดที่ตรงรางวัลและ Baseline สุ่มตามทฤษฎี (เฉพาะหมวดที่มี)
+- กราฟใช้สเกลเดียวกันภายในหมวด แสดงจุดสิ้นสุดสเกลกำกับไว้ แต่ต่างหมวดอาจมีสเกลต่างกัน ไม่ควรเปรียบเทียบความยาวแท่งข้ามหมวด
+- สรุปอัตโนมัติว่าผลย้อนหลังเท่ากันหรือสูตรใดตรงรางวัลมากกว่า พร้อมเตือนเมื่อทดสอบน้อยกว่า 20 งวด (เกณฑ์แจ้งเตือน UI ไม่ใช่เกณฑ์นัยสำคัญทางสถิติ)
+- แยก 0% (ทดสอบแล้วไม่ตรง) จากข้อมูลไม่พอ (—) และไม่คำนวณตัวเปรียบเทียบเมื่อไม่มีจำนวนงวดร่วมกัน
+- กราฟสร้างจากผล Worker จริงทุกครั้ง ไม่มีตัวเลขตัวอย่างฝังในหน้าเว็บ แสดงใหม่เมื่อทดสอบสำเร็จ และล้างเมื่อเริ่มใหม่หรือเกิดข้อผิดพลาด
+- ไม่เปลี่ยน engine.js, legacy-models.js, worker.js, ระบบข่าว, Backend หรือ Google Sheets
+
+## Upgrade from v5.4.2 (แนะนำ)
+
+1. แตกไฟล์ `lottery-insight-v5.4.3-github-pages-update-only.zip`
+2. อัปโหลด `index.html`, `README.md` ที่ root และไฟล์ภายใน `labs/` ทับในโฟลเดอร์เดิม โดยไม่ลบไฟล์อื่น
+3. **คง `config.js`, `labs/labs-config.js`, `style.css`, `script.js` และ `assets/` เดิม**
+4. เมื่อ GitHub Pages เผยแพร่แล้ว กด `Ctrl + F5` เปิด Labs และเลือก 20/40/60 งวด จากนั้นกดทดสอบกับข้อมูลจริง กราฟจะปรากฏเหนือผลตาราง
+
+หากใช้งาน v5.4.2 แล้ว สามารถอัปเดตเฉพาะ `labs/index.html`, `labs/algorithm.js` และ `labs/labs.css` ได้เช่นกัน แต่ Footer ของเว็บหลักและ README จะยังเป็นเวอร์ชันเดิมหากไม่ได้อัปเดตไฟล์ root
+
+ไม่ต้อง Deploy Apps Script ใหม่หรือแก้ Trigger
 
 ## What's new — v5.4.2
 
@@ -153,12 +174,12 @@ repository/
     └── apple-touch-icon.png
 ```
 
-> ZIP รุ่นนี้เป็นแพตช์สำหรับ Repository ที่ติดตั้ง Frontend v5.4.1 และ Labs 0.1 แล้ว ไม่ใช่แพ็กเกจสำหรับติดตั้งใหม่ ไม่บรรจุ `config.js`, `labs/labs-config.js`, `Code.gs` หรือ API Key รวมถึงไม่ทับ `style.css`, `script.js` และ `assets/` ของเว็บหลัก
+> ZIP รุ่นนี้เป็นแพตช์สำหรับ Repository ที่ติดตั้ง Frontend v5.4.1 และ Labs 0.1 หรือ v5.4.2 แล้ว ไม่ใช่แพ็กเกจสำหรับติดตั้งใหม่ ไม่บรรจุ `config.js`, `labs/labs-config.js`, `Code.gs` หรือ API Key รวมถึงไม่ทับ `style.css`, `script.js` และ `assets/` ของเว็บหลัก
 
 ## Upgrade from v5.4.1 + Labs 0.1
 
 1. สำรอง Repository ก่อนอัปเดต
-2. แตกไฟล์ `lottery-insight-v5.4.2-github-pages-update-only.zip`
+2. แตกไฟล์ `lottery-insight-v5.4.3-github-pages-update-only.zip`
 3. อัปโหลด `index.html` และ `README.md` ที่ root และไฟล์ภายใน `labs/` ลงในโฟลเดอร์ `labs/` เดิม (ไม่สร้าง `labs/labs/` หรือ ลบโฟลเดอร์เดิมทั้งโฟลเดอร์)
 4. **คง `config.js` และ `labs/labs-config.js` เดิมไว้ทั้งสองไฟล์** รวมถึง `style.css`, `script.js` และ `assets/` ที่มีอยู่
 5. Commit และเมื่อ GitHub Pages เผยแพร่แล้ว กด `Ctrl + F5` ที่หน้าหลัก คลิกลิงก์ `Labs ↗` ท้ายเว็บ
@@ -166,7 +187,7 @@ repository/
 
 ไม่ต้องแก้ Code.gs, Deploy Apps Script, แก้ Google Sheet หรือสร้าง Trigger ใหม่ หาก Backend เดิมทำงานอยู่แล้ว
 
-## Lottery Insight Labs — UI 0.2.0
+## Lottery Insight Labs — UI 0.2.1
 
 Labs เป็นพื้นที่ทดลองแยกจาก Production ใช้ API เดิม 3 โหมดเท่านั้น:
 
@@ -215,7 +236,17 @@ window.APP_CONFIG = {
 
 สำหรับ Backend v5.3.2 สามารถตรวจความพร้อมเบื้องต้นจาก URL `/exec?mode=health` หาก `ok: true` และ `code: READY` ให้ตรวจ Dashboard และหน้าเว็บต่อ ไม่จำเป็นต้องลบข้อมูลใน Sheet เพื่อแก้ปัญหา UI
 
-## Validation & limitations
+## Validation & limitations — v5.4.3
+
+- ตรวจ JavaScript Syntax ของ Labs ทุกไฟล์ และตรวจ HTML IDs / initial hidden state
+- ทดสอบ render ด้วย DOM จำลอง โดยใช้ตัวเลขผลตัวอย่างที่ผู้ใช้รายงาน: 1/40, 0/2, 5/22, 2/22; ตรวจกราฟครบ 5 หมวด, การคำนวณเปอร์เซ็นต์, ความกว้างแท่ง, Baseline 0.0005%, กรณีไม่มีข้อมูล, จำนวนงวดไม่เท่ากัน, การล้างกราฟ และ DATA_URL ว่าง
+- ทดสอบ Chromium โดยโหลด HTML/CSS และเรียก render ด้วยผลทดสอบจำลอง: Desktop 1440px, Mobile 390px/320px, Dark Mode ไม่พบหน้าเว็บล้นแนวนอนในสามขนาดที่ทดสอบ
+- ตรวจเทียบ engine.js, legacy-models.js, worker.js, common.js, news.js, theme.js กับ v5.4.2 ตรงกันทุกไบต์
+- ไม่มีข้อมูลตัวอย่างใน ZIP; ภาพ preview ใช้ผลย้อนหลังที่ผู้ใช้ส่งมาเป็น fixture เท่านั้น
+
+**ข้อจำกัด:** การทดสอบ Browser รอบนี้เป็นการตรวจการแสดงผลโดยส่งผลทดสอบเข้า render โดยตรง ไม่ได้ทดสอบ Worker, fetch, GitHub Pages หรือ Apps Script Deployment จริง; ไม่ได้คำนวณ Backtest ใหม่จากชีตของผู้ใช้ และไม่ใช่การพิสูจน์ประสิทธิภาพของสูตร
+
+### Previous validation — v5.4.2
 
 - ตรวจ HTML: ID ไม่ซ้ำ, ลิงก์ไฟล์ CSS/JS/รูปภาพและลิงก์กลับหน้าหลักถูกต้อง
 - เปรียบเทียบ `index.html` หลักกับรุ่น 5.4.1: ต่างเฉพาะ Footer และป้ายเวอร์ชัน
@@ -224,7 +255,7 @@ window.APP_CONFIG = {
 - ทดสอบ JavaScript ด้วย DOM/API/Worker จำลอง: Theme, เลขศูนย์นำหน้า, ตัวกรองข่าว, การรักษาข่าวเดิมเมื่อ API ขัดข้อง, ผลทดสอบ 5 แถว, สรุปผล, กรณี History API ล้มเหลวและ DATA_URL ว่าง
 - ไม่ใส่ Dummy data ในแพ็กเกจจริง
 
-**ข้อจำกัด:** Chromium เปิดหน้าเว็บทดสอบไม่ได้ (`ERR_BLOCKED_BY_ADMINISTRATOR`) จึงยังไม่รับรองหน้าตาจริงบน Desktop/Mobile หรือการทำงานของ Worker ผ่าน Browser ในรุ่นนี้ ไม่ได้ทดสอบกับ GitHub Pages/Apps Script Deployment จริง และไม่ได้ตรวจความพร้อมของผู้ให้บริการข่าวใหม่ ผลการทดสอบ UI 5.4.1 ก่อนหน้านี้ไม่ใช่ผลการทดสอบ Browser ของแพตช์นี้
+**ข้อจำกัดของ v5.4.2:** Chromium เปิดหน้าเว็บทดสอบไม่ได้ (`ERR_BLOCKED_BY_ADMINISTRATOR`) จึงยังไม่รับรองหน้าตาจริงบน Desktop/Mobile หรือการทำงานของ Worker ผ่าน Browser ในรุ่นนี้ ไม่ได้ทดสอบกับ GitHub Pages/Apps Script Deployment จริง และไม่ได้ตรวจความพร้อมของผู้ให้บริการข่าวใหม่ ผลการทดสอบ UI 5.4.1 ก่อนหน้านี้ไม่ใช่ผลการทดสอบ Browser ของแพตช์นี้
 
 ## Data sources & credits
 
@@ -237,8 +268,8 @@ window.APP_CONFIG = {
 
 | Component | Version |
 |---|---|
-| Frontend | v5.4.2 — Warm Edition + Labs |
-| Labs UI | v0.2.0 — Single-page |
+| Frontend | v5.4.3 — Warm Edition + Visual Algorithm Lab |
+| Labs UI | v0.2.1 — Visual Comparison |
 | Labs Backend | v0.1.3 — unchanged |
 | Backend | v5.3.2 — Connection Fix |
 | Prediction 2D | Algorithm v3 — Walk-forward Ensemble |
