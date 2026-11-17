@@ -1,6 +1,6 @@
-# Lottery Insight v5.4.1 — Warm Edition
+# Lottery Insight v5.4.2 — Warm Edition + Labs
 
-![Frontend](https://img.shields.io/badge/Frontend-v5.4.1-A15132)
+![Frontend](https://img.shields.io/badge/Frontend-v5.4.2-A15132)
 ![Backend](https://img.shields.io/badge/Backend-v5.3.2-795548)
 ![Hosting](https://img.shields.io/badge/Hosting-GitHub%20Pages-24292f)
 
@@ -11,6 +11,16 @@ Lottery Insight เป็นเว็บไซต์สำหรับดูผ�
 > [!IMPORTANT]
 > เว็บไซต์นี้จัดทำเพื่อการศึกษาและทดลองสถิติ ไม่ใช่คำแนะนำในการซื้อสลาก คะแนน Stat score เป็นคะแนนจัดอันดับ ไม่ใช่ความน่าจะเป็นในการถูกรางวัล ผลย้อนหลังและเลขดังจากข่าวไม่สามารถรับประกันผลในอนาคตได้ ผลรางวัลทางการให้ยึด [สำนักงานสลากกินแบ่งรัฐบาล (GLO)](https://www.glo.or.th/mission/reward-payment/check-reward) เป็นหลัก
 
+## What's new — v5.4.2
+
+- เพิ่มลิงก์ `Labs` ขนาดเล็กใน Footer ต่อจาก Lottery Insight · TheLegionZ เท่านั้น ไม่เพิ่มเมนู Labs ใน Header ของเว็บไซต์หลัก
+- รวม Algorithm Lab และ News Lab ใน `labs/index.html` หน้าเดียว วาง Algorithm ก่อนข่าว และรายละเอียดระบบแบบพับ/ขยายไว้ด้านล่าง
+- ใช้ `style.css` โลโก้ Favicon สี และรูปแบบองค์ประกอบเดียวกับ Warm Edition ของเว็บหลัก
+- Light/Dark Mode ใช้ค่า `lottery-theme` ร่วมกันบน Origin เดียวกัน
+- ผลทดสอบย้อนหลังมีสรุปจำนวนหมวดที่สูตรใหม่ตรงมากกว่า/เท่ากัน/น้อยกว่า/เปรียบเทียบไม่ได้ โดยไม่เปลี่ยนสูตรหรือตีความว่าเป็นผลคาดการณ์อนาคต
+- ลิงก์ `labs/news.html` และ `labs/algorithm.html` เดิมพาไปยังหัวข้อเดิมภายในหน้า Labs ใหม่
+- คง Backend หลัก v5.3.2 และ Labs Backend v0.1.3, ไม่เปลี่ยนแหล่งข่าวหรือสูตร ไม่แก้ Google Sheets, ไม่เปลี่ยน Trigger
+
 ## What's new — v5.4.1
 
 - เปลี่ยนธีมจาก Navy Blue เป็น Warm Edition: ครีม ทองอ่อน Terracotta และน้ำตาล Espresso
@@ -20,7 +30,7 @@ Lottery Insight เป็นเว็บไซต์สำหรับดูผ�
 - ปรับสีช่องกรอกเลขใน Dark Mode ให้อ่านได้ชัดเจน
 - คงโลโก้และ Favicon เดิม พร้อมการแสดงผลบนคอมพิวเตอร์และมือถือ
 
-รุ่นนี้เป็น **Frontend-only update** ไม่เปลี่ยนสูตรคาดการณ์ โครงสร้าง Google Sheets แหล่งข่าว หรือ Backend v5.3.2
+v5.4.1 เป็น **Frontend-only update** ไม่เปลี่ยนสูตรคาดการณ์ โครงสร้าง Google Sheets แหล่งข่าว หรือ Backend v5.3.2
 
 ### Color palette
 
@@ -120,6 +130,19 @@ repository/
 ├── script.js
 ├── config.js                 # ใช้ไฟล์เดิมที่ตั้ง DATA_URL แล้ว
 ├── README.md
+├── labs/
+│   ├── index.html           # Algorithm + News Lab
+│   ├── labs-config.js       # คง URL ของ Labs เดิม
+│   ├── labs.css             # ส่วนเสริมของ ../style.css
+│   ├── theme.js
+│   ├── common.js
+│   ├── algorithm.js
+│   ├── news.js
+│   ├── engine.js           # สูตรเดิมของ Lab
+│   ├── legacy-models.js
+│   ├── worker.js
+│   ├── algorithm.html      # ลิงก์เดิมไป index.html#algorithm
+│   └── news.html           # ลิงก์เดิมไป index.html#news
 └── assets/
     ├── lottery-insight-logo.png
     ├── favicon.ico
@@ -130,17 +153,40 @@ repository/
     └── apple-touch-icon.png
 ```
 
-> Update-only ZIP ไม่ได้บรรจุ `config.js` หรือ `Code.gs` เพื่อรักษาการเชื่อมต่อเดิมและแยก Backend ออกจาก Public Repository
+> ZIP รุ่นนี้เป็นแพตช์สำหรับ Repository ที่ติดตั้ง Frontend v5.4.1 และ Labs 0.1 แล้ว ไม่ใช่แพ็กเกจสำหรับติดตั้งใหม่ ไม่บรรจุ `config.js`, `labs/labs-config.js`, `Code.gs` หรือ API Key รวมถึงไม่ทับ `style.css`, `script.js` และ `assets/` ของเว็บหลัก
 
-## Upgrade from v5.4.0
+## Upgrade from v5.4.1 + Labs 0.1
 
-1. สำรองไฟล์เว็บไซต์เดิม
-2. แตกไฟล์ `lottery-insight-v5.4.1-github-pages-update-only.zip`
-3. อัปโหลด `index.html`, `style.css`, `script.js` และโฟลเดอร์ `assets/` ทับไฟล์เดิมใน GitHub Pages
-4. คง `config.js` เดิมไว้ แล้วนำ README นี้ไปวางที่ root ของ Repository ในชื่อ `README.md`
-5. Commit และรอ GitHub Pages เผยแพร่ตามปกติ จากนั้นกด `Ctrl + F5`
+1. สำรอง Repository ก่อนอัปเดต
+2. แตกไฟล์ `lottery-insight-v5.4.2-github-pages-update-only.zip`
+3. อัปโหลด `index.html` และ `README.md` ที่ root และไฟล์ภายใน `labs/` ลงในโฟลเดอร์ `labs/` เดิม (ไม่สร้าง `labs/labs/` หรือ ลบโฟลเดอร์เดิมทั้งโฟลเดอร์)
+4. **คง `config.js` และ `labs/labs-config.js` เดิมไว้ทั้งสองไฟล์** รวมถึง `style.css`, `script.js` และ `assets/` ที่มีอยู่
+5. Commit และเมื่อ GitHub Pages เผยแพร่แล้ว กด `Ctrl + F5` ที่หน้าหลัก คลิกลิงก์ `Labs ↗` ท้ายเว็บ
+6. ใน Labs ทดลองเลือก 20/40/60 งวด กดทดสอบ และตรวจเมนู News Lab, Theme และลิงก์กลับหน้าหลัก
 
-**ไม่ต้องแก้ Code.gs, ไม่ต้อง Deploy Apps Script ใหม่, ไม่ต้องแก้ Google Sheet และไม่ต้องสร้าง Trigger ใหม่** หาก Backend v5.3.2 เดิมทำงานปกติ
+ไม่ต้องแก้ Code.gs, Deploy Apps Script, แก้ Google Sheet หรือสร้าง Trigger ใหม่ หาก Backend เดิมทำงานอยู่แล้ว
+
+## Lottery Insight Labs — UI 0.2.0
+
+Labs เป็นพื้นที่ทดลองแยกจาก Production ใช้ API เดิม 3 โหมดเท่านั้น:
+
+| API | Mode | Function |
+|---|---|---|
+| Production | `dashboard` | อ่านชุดเลขจาก LotteryChecks ที่ระบบหลักเก็บไว้ |
+| Labs | `history` | อ่านผลสลากย้อนหลังจาก Results เพื่อทดสอบแบบ Walk-forward ใน Worker |
+| Labs | `news` | อ่านข่าวเพิ่มเติมที่เคยรวบรวมไว้และสถานะ Provider |
+
+ผลที่แสดงไม่ใช่ Snapshot ที่ประกาศจริง และยังไม่ Promote สูตรใดเข้า Production. แหล่งข่าว RANLOTTO และ GNews ยังไม่ได้ข้อมูลข่าวตรงหัวข้อจากการทดสอบที่ผ่านมา การรวม UI ไม่ได้แก้ข้อจำกัดของผู้ให้บริการหรือเพิ่มข่าวใหม่
+
+หากต้องตั้ง `labs/labs-config.js` ใหม่ ให้ใช้ **Web App URL ของ Project LotteryLabs** ไม่ใช่ URL ของระบบหลัก:
+
+```javascript
+window.LOTTERY_LABS_CONFIG = {
+  DATA_URL: 'https://script.google.com/macros/s/YOUR_LABS_DEPLOYMENT_ID/exec'
+};
+```
+
+ตรวจ `?mode=health` และ `?mode=history` ของ Labs Web App ใน Browser หากติดปัญหา และใช้ `config.js` ของระบบหลักแยกต่างหาก. ห้ามใส่ API Key ลงในไฟล์ Frontend ทั้งสอง
 
 ## Configuration (กรณีติดตั้งใหม่)
 
@@ -171,9 +217,14 @@ window.APP_CONFIG = {
 
 ## Validation & limitations
 
-การทดสอบรุ่น UI ที่รายงานไว้ครอบคลุม Desktop 1440px, Mobile 390px/320px, Light/Dark Mode, การตรวจสลากหลายใบและเลขซ้ำ, สถานะประวัติที่ตรงรางวัล และ JavaScript/HTML IDs โดยใช้ Chromium กับ API จำลองสำหรับการทดสอบเท่านั้น ไม่ได้บรรจุ Dummy data ในแพ็กเกจใช้งานจริง
+- ตรวจ HTML: ID ไม่ซ้ำ, ลิงก์ไฟล์ CSS/JS/รูปภาพและลิงก์กลับหน้าหลักถูกต้อง
+- เปรียบเทียบ `index.html` หลักกับรุ่น 5.4.1: ต่างเฉพาะ Footer และป้ายเวอร์ชัน
+- ตรวจ JavaScript Syntax ทุกไฟล์ของ Labs
+- เปรียบเทียบ `engine.js`, `legacy-models.js`, `worker.js`, `common.js` กับแพ็กเกจเดิม: ตรงกันทุกไบต์
+- ทดสอบ JavaScript ด้วย DOM/API/Worker จำลอง: Theme, เลขศูนย์นำหน้า, ตัวกรองข่าว, การรักษาข่าวเดิมเมื่อ API ขัดข้อง, ผลทดสอบ 5 แถว, สรุปผล, กรณี History API ล้มเหลวและ DATA_URL ว่าง
+- ไม่ใส่ Dummy data ในแพ็กเกจจริง
 
-ยังไม่ได้ยืนยันผลบน GitHub Repository และ Apps Script Deployment จริงของผู้ดูแล และแหล่งข้อมูลภายนอกอาจเปลี่ยนโครงสร้างหรือจำกัดการเข้าถึงได้
+**ข้อจำกัด:** Chromium เปิดหน้าเว็บทดสอบไม่ได้ (`ERR_BLOCKED_BY_ADMINISTRATOR`) จึงยังไม่รับรองหน้าตาจริงบน Desktop/Mobile หรือการทำงานของ Worker ผ่าน Browser ในรุ่นนี้ ไม่ได้ทดสอบกับ GitHub Pages/Apps Script Deployment จริง และไม่ได้ตรวจความพร้อมของผู้ให้บริการข่าวใหม่ ผลการทดสอบ UI 5.4.1 ก่อนหน้านี้ไม่ใช่ผลการทดสอบ Browser ของแพตช์นี้
 
 ## Data sources & credits
 
@@ -186,7 +237,9 @@ window.APP_CONFIG = {
 
 | Component | Version |
 |---|---|
-| Frontend | v5.4.1 — Warm Edition |
+| Frontend | v5.4.2 — Warm Edition + Labs |
+| Labs UI | v0.2.0 — Single-page |
+| Labs Backend | v0.1.3 — unchanged |
 | Backend | v5.3.2 — Connection Fix |
 | Prediction 2D | Algorithm v3 — Walk-forward Ensemble |
 | Prediction 6D | Algorithm v2 — Coverage + Diversity |
