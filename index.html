@@ -6,16 +6,16 @@
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
 <meta content="สถิติผลสลากย้อนหลัง ตรวจรางวัล และบันทึกการคาดการณ์แบบตรวจสอบย้อนหลังได้" name="description"/>
 <title>Lottery Insight · TheLegionZ</title>
-<link href="style.css?v=5.4.0" rel="stylesheet"/>
-<link href="assets/favicon.ico?v=5.4.0" rel="icon" sizes="any"/>
-<link href="assets/favicon-32.png?v=5.4.0" rel="icon" sizes="32x32" type="image/png"/>
-<link href="assets/favicon-192.png?v=5.4.0" rel="icon" sizes="192x192" type="image/png"/>
-<link href="assets/apple-touch-icon.png?v=5.4.0" rel="apple-touch-icon" sizes="180x180"/>
+<link href="style.css?v=5.4.1" rel="stylesheet"/>
+<link href="assets/favicon.ico?v=5.4.1" rel="icon" sizes="any"/>
+<link href="assets/favicon-32.png?v=5.4.1" rel="icon" sizes="32x32" type="image/png"/>
+<link href="assets/favicon-192.png?v=5.4.1" rel="icon" sizes="192x192" type="image/png"/>
+<link href="assets/apple-touch-icon.png?v=5.4.1" rel="apple-touch-icon" sizes="180x180"/>
 </head>
 <body>
 <div aria-live="polite" class="page-loader" id="pageLoader">
 <div class="loader-card">
-<div class="loader-mark"><img alt="" aria-hidden="true" src="assets/favicon-192.png?v=5.4.0"/></div>
+<div class="loader-mark"><img alt="" aria-hidden="true" src="assets/favicon-192.png?v=5.4.1"/></div>
 <div aria-hidden="true" class="loader-spinner"></div>
 <strong>กำลังโหลด Lottery Insight</strong>
 <span id="pageLoaderText">กำลังเชื่อมต่อข้อมูลล่าสุด...</span>
@@ -24,9 +24,9 @@
 <header class="topbar">
 <div class="container topbar-inner">
 <a aria-label="Lottery Insight" class="brand brand-logo" href="#">
-<img alt="Lottery Insight by TheLegionZ" src="assets/lottery-insight-logo.png?v=5.4.0"/>
+<img alt="Lottery Insight by TheLegionZ" src="assets/lottery-insight-logo.png?v=5.4.1"/>
 </a>
-<nav aria-label="เมนูหลัก" class="main-nav"><a href="#latest">ผลล่าสุด</a><a href="#check">ตรวจรางวัล</a><a href="#news">เลขดังจากข่าว</a><a href="#history">ผลย้อนหลัง</a><a href="#system">สถิติระบบ</a></nav><div class="header-actions">
+<nav aria-label="เมนูหลัก" class="main-nav"><a href="#latest">ผลล่าสุด</a><a href="#check">ตรวจรางวัล</a><a href="#news">เลขดังจากข่าว</a><a href="#system">การคาดการณ์</a><a href="#history">ผลย้อนหลัง</a><a href="#algorithm">สถิติระบบ</a></nav><div class="header-actions">
 
 
 <span class="status-pill" id="statusPill"><i></i><span id="statusText">กำลังโหลด</span></span>
@@ -137,7 +137,7 @@
 <p class="checker-note">
         กรุณาตรวจสอบเลขและงวดก่อนกดตรวจรางวัล ผลเพื่อการใช้งานจริงให้ยึดประกาศสำนักงานสลากกินแบ่งรัฐบาล
       </p>
-</section></section><div class="section-intro" id="explore"><div><p class="eyebrow">สำรวจข้อมูล</p><h2>ติดตามข้อมูลสลาก</h2></div><p>ข่าวและผลย้อนหลัง แยกจากผลคาดการณ์ของระบบ</p></div><section aria-labelledby="newsTitle" class="card news-card" id="news">
+</section></section><div class="section-intro" id="explore"><div><p class="eyebrow">สำรวจข้อมูล</p><h2>ติดตามข้อมูลสลาก</h2></div><p>ข่าวและการคาดการณ์เชิงทดลอง พร้อมผลย้อนหลัง</p></div><section aria-labelledby="newsTitle" class="card news-card" id="news">
 <div class="section-head news-head">
 <div>
 <span class="label">จากแหล่งข่าว</span>
@@ -171,47 +171,6 @@
 </div>
 <p class="news-disclaimer">ข้อมูลเลขดังรวบรวมจาก <a href="https://lotterychecks.com/lucky-picks" rel="noopener noreferrer" target="_blank">LotteryChecks</a> โดยแยกชุดเลขตามสำนักที่ระบุไว้ในต้นทาง ไม่ใช่ผลรางวัลทางการหรือคำรับประกันว่าจะออก</p>
 
-</section><section class="section" id="history">
-<div class="section-head">
-<div>
-<span class="label">ผลสลากย้อนหลัง</span>
-<h2>ประวัติผลสลาก <small class="history-count" id="historyCount"></small></h2>
-</div>
-<button class="secondary-btn" id="reloadBtn">↻ โหลดใหม่</button>
-</div>
-<div class="table-wrap card history-card">
-<table>
-<thead><tr><th>งวดวันที่</th><th>รางวัลที่ 1</th><th>เลขท้าย 2 ตัว</th></tr></thead>
-<tbody id="historyBody"></tbody>
-</table>
-</div>
-</section><section class="section" id="statistics">
-<div class="section-head responsive-head">
-<div>
-<span class="label">สถิติย้อนหลัง</span>
-<h2>เลขออกมาก / ออกน้อย</h2>
-</div>
-<div class="tabs" id="rangeTabs">
-<button data-range="10">10 งวด</button>
-<button data-range="20">20 งวด</button>
-<button class="active" data-range="50">50 งวด</button>
-<button data-range="all">ทั้งหมด</button>
-</div>
-</div>
-<div class="stats-grid">
-<article class="card stat-card">
-<span class="mini-title">ออกบ่อย</span>
-<div class="number-chips" id="hotNumbers"></div>
-</article>
-<article class="card stat-card">
-<span class="mini-title">ออกน้อย</span>
-<div class="number-chips" id="coldNumbers"></div>
-</article>
-<article class="card stat-card chart-card">
-<span class="mini-title">ความถี่ตัวเลข 0–9</span>
-<div class="digit-chart" id="digitChart"></div>
-</article>
-</div>
 </section><div class="section-intro technical-intro" id="system"><div><p class="eyebrow">STATISTICS LAB</p><h2>การทดลองและติดตามผลระบบ</h2></div><p>ข้อมูลสำหรับประเมินสูตร ไม่ใช่คำแนะนำในการซื้อสลาก</p></div><section class="warning">
 <strong>เพื่อดูสถิติและทดลองสูตรเท่านั้น</strong>
 <span>Stat score ไม่ใช่โอกาสถูกรางวัล ผลแต่ละงวดเป็นอิสระ และไม่ควรใช้เว็บไซต์นี้เป็นคำแนะนำในการซื้อสลาก</span>
@@ -309,7 +268,48 @@
 <tbody id="newsAuditHistory"><tr><td colspan="5">ยังไม่มี Snapshot ที่ตรวจผลแล้ว</td></tr></tbody>
 </table>
 </div>
-</details></section><section class="card algorithm-card" id="algorithm">
+</details></section><section class="section" id="history">
+<div class="section-head">
+<div>
+<span class="label">ผลสลากย้อนหลัง</span>
+<h2>ประวัติผลสลาก <small class="history-count" id="historyCount"></small></h2>
+</div>
+<button class="secondary-btn" id="reloadBtn">↻ โหลดใหม่</button>
+</div>
+<div class="table-wrap card history-card">
+<table>
+<thead><tr><th>งวดวันที่</th><th>รางวัลที่ 1</th><th>เลขท้าย 2 ตัว</th></tr></thead>
+<tbody id="historyBody"></tbody>
+</table>
+</div>
+</section><section class="section" id="statistics">
+<div class="section-head responsive-head">
+<div>
+<span class="label">สถิติย้อนหลัง</span>
+<h2>เลขออกมาก / ออกน้อย</h2>
+</div>
+<div class="tabs" id="rangeTabs">
+<button data-range="10">10 งวด</button>
+<button data-range="20">20 งวด</button>
+<button class="active" data-range="50">50 งวด</button>
+<button data-range="all">ทั้งหมด</button>
+</div>
+</div>
+<div class="stats-grid">
+<article class="card stat-card">
+<span class="mini-title">ออกบ่อย</span>
+<div class="number-chips" id="hotNumbers"></div>
+</article>
+<article class="card stat-card">
+<span class="mini-title">ออกน้อย</span>
+<div class="number-chips" id="coldNumbers"></div>
+</article>
+<article class="card stat-card chart-card">
+<span class="mini-title">ความถี่ตัวเลข 0–9</span>
+<div class="digit-chart" id="digitChart"></div>
+</article>
+</div>
+</section><section class="card algorithm-card" id="algorithm">
 <div class="section-head algorithm-head">
 <div>
 <span class="label">Algorithm Performance</span>
@@ -373,7 +373,7 @@
 <div class="container footer-inner">
 <span>Lottery Insight · TheLegionZ</span>
 <span>ผลทางการให้ยึดสำนักงานสลากกินแบ่งรัฐบาล · Data: <a href="https://lotterychecks.com/" rel="noreferrer" target="_blank">LotteryChecks</a></span>
-<span class="site-version">UI v5.4.0</span></div>
+<span class="site-version">UI v5.4.1</span></div>
 </footer>
 <div class="result-modal-backdrop" hidden="" id="resultModal">
 <div aria-labelledby="resultModalTitle" aria-modal="true" class="result-modal-card" id="resultModalCard" role="dialog">
@@ -387,7 +387,7 @@
 </div>
 </div>
 <div class="toast" id="toast"></div>
-<script src="config.js?v=5.4.0"></script>
-<script src="script.js?v=5.4.0"></script>
+<script src="config.js?v=5.4.1"></script>
+<script src="script.js?v=5.4.1"></script>
 </body>
 </html>
