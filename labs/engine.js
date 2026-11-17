@@ -31,11 +31,24 @@ function any(nums,g){return nums.some(n=>Object.entries(g).some(([k,a])=>a.inclu
 function stats(label){return {label,tests:0,hits:0};}function tally(s,ok){s.tests++;if(ok)s.hits++;}
 function baseline(k){return k==='last2'?5:k==='six'?.0005:100*(1-(995/1000)*(994/999));}
 function run(rows,limit=40){const hist=[...new Map(rows.filter(r=>/^\d{4}-\d{2}-\d{2}$/.test(r.drawDate)&&valid(r.firstPrize,6)&&valid(r.last2,2)).map(r=>[r.drawDate,r])).values()].sort((a,b)=>a.drawDate.localeCompare(b.drawDate));
-  const result={draws:hist.length,latest:hist.at(-1)?.drawDate||'',categories:{}};
-  for(const k of Object.keys(spec)){const newer=stats('Multi-window lab'),older=stats(k==='last2'?'Production v3':k==='six'?'Production v2':'Frequency baseline');const na=stats('Lab — any prize'),oa=stats('Production — any prize');
-    for(let t=Math.max(20,hist.length-limit);t<hist.length;t++){const train=hist.slice(0,t).reverse(),target=hist[t],a=actual(target,k);if(!a.length)continue;const pick=k==='six'?sixPick(train):shortPick(train,k);if(pick.length!==5)continue;
-      let old;if(k==='last2')old=oldTwo(train);else if(k==='six')old=oldSix(train);else {const c=new Map();train.slice(0,80).flatMap(r=>actual(r,k)).forEach(n=>c.set(n,(c.get(n)||0)+1));old=Array.from({length:1000},(_,i)=>String(i).padStart(3,'0')).sort((a,b)=>(c.get(b)||0)-(c.get(a)||0)||a.localeCompare(b)).slice(0,5);}if(old.length!==5)continue;
-      tally(newer,hit(pick,a));tally(older,hit(old,a));if(k==='six'){const g=complete(target);if(g){tally(na,any(pick,g));tally(oa,any(old,g));}}
+  limit=Math.max(1,Math.min(60,Math.floor(Number(limit)||40)));
+  const start=Math.max(0,hist.length-limit), evaluationStart=Math.max(20,start);
+  const result={draws:hist.length,latest:hist.at(-1)?.drawDate||'',categories:{},quality:{requested:limit,window:hist.length-start,earliest:hist[0]?.drawDate||'',windowStart:hist[start]?.drawDate||'',categories:{},rows:[]}};
+  const q=result.quality;
+  const required={p1:1,p2:5,p3:10,p4:50,p5:100,near:2,front3:2,back3:2,last2:1};
+  function issues(r){const found={};for(const p of r.prizes||[]){const k=prizeType(p);if(k)(found[k]??=[]).push(p.numbers);}
+    const out=[];for(const [k,n] of Object.entries(required)){const a=found[k],d=k==='last2'?2:k==='front3'||k==='back3'?3:6;if(!a)out.push(k+':missing');else if(a.length!==1||!Array.isArray(a[0])||a[0].length!==n||!a[0].every(x=>valid(x,d)))out.push(k+':invalid');else if(k==='p1'&&a[0][0]!==r.firstPrize||k==='last2'&&a[0][0]!==r.last2)out.push(k+':mismatch');}if(!r.completePrizeData)out.push('flag');return out;}
+  for(let t=0;t<hist.length;t++){const r=hist[t];q.rows.push({date:r.drawDate,inWindow:t>=start,issues:issues(r),front3:actual(r,'front3').length>0,back3:actual(r,'back3').length>0,complete:!!complete(r)});}
+  function quality(k){return {available:hist.filter(r=>k==='any'?!!complete(r):actual(r,k).length>0).length,window:q.window,missing:0,training:0,formula:0,tested:0,skipped:[]};}
+  function skip(v,t,reason){v[reason]++;v.skipped.push({date:hist[t].drawDate,reason});}
+  const aq=q.categories.any=quality('any');
+  for(const k of Object.keys(spec)){const newer=stats('Multi-window lab'),older=stats(k==='last2'?'Production v3':k==='six'?'Production v2':'Frequency baseline');const na=stats('Lab — any prize'),oa=stats('Production — any prize');const cq=q.categories[k]=quality(k);
+    for(let t=start;t<hist.length;t++){const train=hist.slice(0,t).reverse(),target=hist[t],a=actual(target,k),g=k==='six'?complete(target):null;
+      if(!a.length){skip(cq,t,'missing');if(k==='six')skip(aq,t,g?'formula':'missing');continue;}
+      if(t<evaluationStart||train.filter(r=>actual(r,k).length>0).length<20){skip(cq,t,'training');if(k==='six')skip(aq,t,g?'training':'missing');continue;}
+      const pick=k==='six'?sixPick(train):shortPick(train,k);if(pick.length!==5){skip(cq,t,'formula');if(k==='six')skip(aq,t,g?'formula':'missing');continue;}
+      let old;if(k==='last2')old=oldTwo(train);else if(k==='six')old=oldSix(train);else {const c=new Map();train.slice(0,80).flatMap(r=>actual(r,k)).forEach(n=>c.set(n,(c.get(n)||0)+1));old=Array.from({length:1000},(_,i)=>String(i).padStart(3,'0')).sort((a,b)=>(c.get(b)||0)-(c.get(a)||0)||a.localeCompare(b)).slice(0,5);}if(old.length!==5){skip(cq,t,'formula');if(k==='six')skip(aq,t,g?'formula':'missing');continue;}
+      tally(newer,hit(pick,a));tally(older,hit(old,a));cq.tested++;if(k==='six'){if(g){tally(na,any(pick,g));tally(oa,any(old,g));aq.tested++;}else skip(aq,t,'missing');}
     }
     // Candidate output is intentionally not promoted or stored in production.
     result.categories[k]={baseline:baseline(k),newer,older,anyNew:k==='six'?na:null,anyOld:k==='six'?oa:null};

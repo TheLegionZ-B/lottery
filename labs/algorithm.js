@@ -1,5 +1,20 @@
 function fmt(s){return s&&s.tests?`${s.hits} / ${s.tests} · ${(100*s.hits/s.tests).toFixed(2)}%`:'ข้อมูลไม่พอ';}
-function overview(d){const box=$('#resultOverview'); if(!box)return;box.replaceChildren();const pairs=Object.values(d.categories).map(x=>[x.older,x.newer]);const six=d.categories.six;if(six)pairs.push([six.anyOld,six.anyNew]);let better=0,tied=0,worse=0,missing=0;for(const [a,b] of pairs){if(!a?.tests||!b?.tests||a.tests!==b.tests){missing++;continue;}if(b.hits>a.hits)better++;else if(b.hits<a.hits)worse++;else tied++;}box.append(el('strong','สรุปผลย้อนหลังชุดนี้'),el('p',`สูตรใหม่ตรงมากกว่า ${better} หมวด · เท่ากัน ${tied} หมวด · น้อยกว่า ${worse} หมวด · เปรียบเทียบไม่ได้ ${missing} หมวด`),el('p','ตัวเลขเป็นผลทดสอบย้อนหลังเท่านั้น ไม่ได้พิสูจน์ว่าสูตรใดคาดการณ์อนาคตได้แม่นกว่า'));box.hidden=false;}
+// Both models are evaluated on the same latest target window by the Worker.
+// A single eligibility list drives every visible result; partial windows never enter the UI.
+function eligibleCategories(d,limit){
+  const q=d.quality;
+  if(![20,40,60].includes(limit)||!q||q.requested!==limit||q.window!==limit)return [];
+  const names={last2:'เลขท้าย 2 ตัว',front3:'เลขหน้า 3 ตัว',back3:'เลขท้าย 3 ตัว',six:'รางวัลที่ 1 (6 หลัก)'};
+  const out=[];
+  function add(k,title,a,b,base){
+    const v=q.categories?.[k];
+    if(chartRate(a)===null||chartRate(b)===null||a.tests!==limit||b.tests!==limit||!v||v.window!==limit||v.tested!==limit||v.missing!==0||v.training!==0||v.formula!==0||!Array.isArray(v.skipped)||v.skipped.length!==0)return;
+    out.push({k,title,a,b,base:Number.isFinite(base)&&base>=0&&base<=100?base:null});
+  }
+  for(const k of Object.keys(names)){const x=d.categories?.[k];if(!x)continue;add(k,names[k],x.older,x.newer,x.baseline);if(k==='six')add('any','เลขสลาก 6 หลัก — ตรงรางวัลใดก็ได้',x.anyOld,x.anyNew,null);}
+  return out;
+}
+function overview(items,limit){const box=$('#resultOverview');box.replaceChildren();let better=0,tied=0,worse=0;for(const {a,b} of items){if(b.hits>a.hits)better++;else if(b.hits<a.hits)worse++;else tied++;}box.append(el('strong',`สรุปผลย้อนหลัง ${limit} งวด`),el('p',`สูตรใหม่ตรงมากกว่า ${better} หมวด · เท่ากัน ${tied} หมวด · น้อยกว่า ${worse} หมวด`),el('p','ตัวเลขเป็นผลทดสอบย้อนหลังเท่านั้น ไม่ได้พิสูจน์ว่าสูตรใดคาดการณ์อนาคตได้แม่นกว่า'));box.hidden=!items.length;}
 // Visualisation uses the Worker result; no new data, scores, or predictions.
 function chartRate(s){return s&&Number.isInteger(s.tests)&&s.tests>0&&Number.isInteger(s.hits)&&s.hits>=0&&s.hits<=s.tests?100*s.hits/s.tests:null;}
 function chartPct(v){if(v===null||!Number.isFinite(v))return '—';return v.toFixed(v>0&&v<.01?4:2)+'%';}
@@ -18,7 +33,15 @@ function comparisonCard(title,a,b,base){const ar=chartRate(a),br=chartRate(b),co
     if(base!==null){const expected=tests*base/100;if(expected>=.01)note+=` ส่วน Baseline คาดหมายเฉลี่ย ${Number(expected.toPrecision(3))} งวด`;}}
   card.append(el('p',note,'labs-chart-summary'),el('p',tests!==null&&tests<20?'จำนวนงวดทดสอบน้อยมาก ยังใช้ยืนยันความแม่นยำไม่ได้':'ผลย้อนหลังไม่ใช่หลักฐานว่าคาดการณ์งวดถัดไปได้แม่นกว่า','labs-chart-caution'));return card;
 }
-function renderComparison(d){const root=$('#comparisonCards'),section=$('#comparison');root.replaceChildren();const names={last2:'เลขท้าย 2 ตัว',front3:'เลขหน้า 3 ตัว',back3:'เลขท้าย 3 ตัว',six:'รางวัลที่ 1 (6 หลัก)'};for(const k of Object.keys(names)){const x=d.categories[k];if(!x)continue;const base=Number.isFinite(x.baseline)&&x.baseline>=0&&x.baseline<=100?x.baseline:null;root.append(comparisonCard(names[k],x.older,x.newer,base));if(k==='six')root.append(comparisonCard('เลขสลาก 6 หลัก — ตรงรางวัลใดก็ได้',x.anyOld,x.anyNew,null));}section.hidden=false;}
-function resetComparison(){const section=$('#comparison');section.hidden=true;$('#comparisonCards').replaceChildren();}
-function render(d){overview(d);renderComparison(d);$('#summary').textContent=`ข้อมูล ${d.draws} งวด · ล่าสุด ${thDate(d.latest)} · จำนวนงวดที่ใช้ได้อาจต่างกันตามหมวด`;const root=$('#results');root.replaceChildren();const names={last2:'เลขท้าย 2 ตัว',front3:'เลขหน้า 3 ตัว',back3:'เลขท้าย 3 ตัว',six:'รางวัลที่ 1 (6 หลัก)'};for(const [k,x] of Object.entries(d.categories)){const row=el('tr');for(const txt of [names[k],`${x.older.label} — ${fmt(x.older)}`,fmt(x.newer),`${x.baseline.toFixed(k==='six'?4:2)}%`])row.append(el('td',txt));root.append(row);if(k==='six'){const r=el('tr');for(const txt of ['6 หลัก — ตรงรางวัลใดก็ได้',fmt(x.anyOld),fmt(x.anyNew),'ไม่ประเมินใน Lab รุ่นนี้'])r.append(el('td',txt));root.append(r);}}}
-$('#run').addEventListener('click',async()=>{const b=$('#run'),s=$('#status');b.disabled=true;$('#limit').disabled=true;s.className='status';s.textContent='กำลังโหลดผลย้อนหลัง…';$('#results').replaceChildren();$('#summary').textContent='';$('#resultOverview').hidden=true;resetComparison();let w,timer;try{if(!labUrl())throw Error('กรุณาตั้ง DATA_URL ใน labs-config.js');const d=await request(labUrl(),'history');if(!Array.isArray(d.results))throw Error('รูปแบบผลย้อนหลังไม่ถูกต้อง');s.textContent='กำลังทดสอบ Walk-forward ในเครื่องของคุณ…';const result=await new Promise((resolve,reject)=>{w=new Worker('worker.js?v=0.2.0');timer=setTimeout(()=>reject(Error('ทดสอบเกินเวลา ลองลดจำนวนงวด')),90000);w.onmessage=e=>e.data.ok?resolve(e.data.result):reject(Error(e.data.error));w.onerror=()=>reject(Error('โหลด Algorithm Worker ไม่สำเร็จ'));w.postMessage({rows:d.results,limit:Number($('#limit').value)});});render(result);s.textContent='ทดสอบเสร็จแล้ว · ไม่มีการแก้ระบบหลัก';s.className='status ok';}catch(e){resetComparison();$('#resultOverview').hidden=true;s.textContent=errorText(e);s.className='status error';}finally{clearTimeout(timer);if(w)w.terminate();b.disabled=false;$('#limit').disabled=false;}});
+function renderComparison(items){const root=$('#comparisonCards'),section=$('#comparison');root.replaceChildren();for(const {title,a,b,base} of items)root.append(comparisonCard(title,a,b,base));section.hidden=!items.length;}
+function resetResults(){ $('#comparison').hidden=true;$('#comparisonCards').replaceChildren();$('#resultOverview').hidden=true;$('#resultOverview').replaceChildren();$('#resultTable').hidden=true;$('#results').replaceChildren();$('#summary').textContent=''; }
+function render(d,limit){
+  resetResults();const items=eligibleCategories(d,limit),root=$('#results');
+  $('#summary').textContent=`ข้อมูล ${d.draws} งวด · ล่าสุด ${thDate(d.latest)} · แสดงเฉพาะหมวดที่ทดสอบครบ ${limit} งวด (${items.length} จาก 5 หมวด)`;
+  if(!items.length)return false;
+  overview(items,limit);renderComparison(items);
+  for(const {k,title,a,b,base} of items){const row=el('tr');for(const txt of [title,`${a.label} — ${fmt(a)}`,fmt(b),base===null?'ไม่ประเมินใน Lab รุ่นนี้':chartPct(base)])row.append(el('td',txt));root.append(row);}
+  $('#resultTable').hidden=false;return true;
+}
+$('#limit').addEventListener('change',()=>{resetResults();const s=$('#status');s.className='status';s.textContent='เลือกจำนวนงวดแล้ว กดทดสอบอีกครั้ง';});
+$('#run').addEventListener('click',async()=>{const b=$('#run'),s=$('#status'),limit=Number($('#limit').value);b.disabled=true;$('#limit').disabled=true;s.className='status';s.textContent='กำลังโหลดผลย้อนหลัง…';resetResults();let w,timer;try{if(!labUrl())throw Error('กรุณาตั้ง DATA_URL ใน labs-config.js');const d=await request(labUrl(),'history');if(!Array.isArray(d.results))throw Error('รูปแบบผลย้อนหลังไม่ถูกต้อง');s.textContent='กำลังทดสอบ Walk-forward ในเครื่องของคุณ…';const result=await new Promise((resolve,reject)=>{w=new Worker('worker.js?v=0.2.2');timer=setTimeout(()=>reject(Error('ทดสอบเกินเวลา ลองลดจำนวนงวด')),90000);w.onmessage=e=>e.data.ok?resolve(e.data.result):reject(Error(e.data.error));w.onerror=()=>reject(Error('โหลด Algorithm Worker ไม่สำเร็จ'));w.postMessage({rows:d.results,limit});});const hasResults=render(result,limit);s.textContent=hasResults?'ทดสอบเสร็จแล้ว · ไม่มีการแก้ระบบหลัก':`ยังไม่มีหมวดที่ทดสอบได้ครบ ${limit} งวด · ลองเลือกจำนวนงวดน้อยลง`;s.className=hasResults?'status ok':'status';}catch(e){resetResults();s.textContent=errorText(e);s.className='status error';}finally{clearTimeout(timer);if(w)w.terminate();b.disabled=false;$('#limit').disabled=false;}});

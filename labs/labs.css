@@ -65,3 +65,10 @@ body.dark .labs-chart-fill.random{background:#aaa39b}
 .labs-page .labs-comparison-note{margin:10px 0 0}
 @media(max-width:850px){.labs-page .labs-comparison-grid{grid-template-columns:1fr}}
 @media(max-width:560px){.labs-page .labs-chart{padding:12px}.labs-page .labs-chart-label{font-size:12px}.labs-page .labs-chart-label strong{font-size:15px}}
+
+/* v0.2.2 – diagnostic cards and horizontally scrollable data table */
+.labs-page #sourceCards{grid-template-columns:repeat(3,minmax(0,1fr));margin-top:12px}.labs-page #sourceCards p{overflow-wrap:anywhere}.labs-page #sourceCards h4{margin:0;color:var(--text)}.labs-page #sourceCards details summary{cursor:pointer}
+@media(max-width:850px){.labs-page #sourceCards{grid-template-columns:1fr}}
+
+/* v0.2.3 — no partial comparison table */
+.labs-page #resultTable[hidden]{display:none}
