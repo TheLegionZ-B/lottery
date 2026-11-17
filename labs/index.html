@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="พื้นที่ทดลองสูตรสถิติผลสลากและติดตามแหล่งข่าวแยกจากระบบหลัก">
+  <title>Lottery Insight Labs · TheLegionZ</title>
+  <link href="../assets/favicon.ico?v=5.4.1" rel="icon" sizes="any">
+  <link href="../assets/favicon-32.png?v=5.4.1" rel="icon" sizes="32x32" type="image/png">
+  <link href="../assets/apple-touch-icon.png?v=5.4.1" rel="apple-touch-icon">
+  <link href="../style.css?v=5.4.1" rel="stylesheet">
+  <link href="labs.css?v=0.2.0" rel="stylesheet">
+  <script src="theme.js?v=0.2.0"></script>
+</head>
+<body class="labs-page">
+<header class="topbar">
+  <div class="container topbar-inner">
+    <a class="brand brand-logo" href="../index.html" aria-label="Lottery Insight — กลับหน้าหลัก"><img src="../assets/lottery-insight-logo.png?v=5.4.1" alt="Lottery Insight by TheLegionZ"></a>
+    <nav class="main-nav" aria-label="เมนู Labs"><a href="../index.html">หน้าหลัก</a><a href="#algorithm">Algorithm Lab</a><a href="#news">News Lab</a><a href="#details">รายละเอียดระบบ</a></nav>
+    <div class="header-actions"><span class="labs-tag">R&amp;D</span><button type="button" class="icon-btn" id="themeBtn" aria-label="เปลี่ยน Theme">🌙</button></div>
+  </div>
+</header>
+<main class="container">
+  <div class="welcome" id="home"><div><p class="eyebrow">LOTTERY INSIGHT / LABS</p><h1>พื้นที่ทดลองและพัฒนา</h1><p>ทดสอบสูตรด้วยผลสลากจริง และติดตามแหล่งข่าวเพิ่มเติมในที่เดียว</p></div><a class="official-link" href="../index.html">← กลับหน้าหลัก</a></div>
+  <section class="card result-card labs-banner" aria-label="พื้นที่ทดลอง">
+    <div><p class="label">LOTTERY INSIGHT LABS</p><h2>ทดลองได้ โดยไม่กระทบระบบหลัก</h2><p>ข้อมูลผลสลากย้อนหลังแบบอ่านอย่างเดียว สูตรที่ทดสอบยังไม่ถูกนำไปใช้แทนสูตรจริง</p></div>
+    <a class="labs-banner-link" href="#algorithm">เริ่มทดสอบ ↓</a>
+  </section>
+  <section id="algorithm" aria-labelledby="algorithmTitle">
+    <div class="section-intro"><div><p class="eyebrow">ALGORITHM LAB</p><h2 id="algorithmTitle">ทดสอบสูตรคาดการณ์</h2></div><p>เปรียบเทียบสูตรเดิมกับ Multi-window แบบ Walk-forward</p></div>
+    <article class="card labs-card">
+      <div class="card-head"><div><span class="label">BACKTEST</span><h2>ทดสอบกับข้อมูลจริง</h2></div><span class="snapshot-badge">Read-only</span></div>
+      <div class="labs-toolbar labs-test-controls"><label for="limit">จำนวนงวดล่าสุดที่ต้องการทดสอบ</label><select id="limit" class="draw-select"><option value="20">20 งวด</option><option value="40" selected>40 งวด</option><option value="60">60 งวด</option></select><button class="primary-btn" type="button" id="run">ทดสอบกับข้อมูลจริง</button></div>
+      <p class="status" id="status" role="status">เลือกจำนวนงวด แล้วกดทดสอบ</p>
+      <p class="labs-muted" id="summary"></p>
+      <div class="labs-results" id="resultOverview" hidden aria-live="polite"></div>
+      <div class="table-wrap labs-table" tabindex="0" role="region" aria-label="ตารางเปรียบเทียบผลทดสอบ เลื่อนแนวนอนได้"><table><thead><tr><th scope="col">หมวดรางวัล</th><th scope="col">สูตรเดิม / อ้างอิง</th><th scope="col">Multi-window Lab</th><th scope="col">Baseline สุ่ม*</th></tr></thead><tbody id="results"><tr><td colspan="4">ยังไม่ได้เริ่มทดสอบ</td></tr></tbody></table></div>
+      <p class="labs-muted">* สูตรทั้งสองเลือก 5 หมายเลขต่อหมวดไม่ซ้ำกัน ผลย้อนหลังไม่ใช่การรับประกันผลในอนาคต จำนวนงวดที่ใช้ได้อาจต่ำกว่าที่เลือกเมื่อข้อมูลฝึกหรือผลรางวัลไม่ครบ</p>
+    </article>
+  </section>
+  <section id="news" aria-labelledby="newsTitle">
+    <div class="section-intro"><div><p class="eyebrow">NEWS LAB</p><h2 id="newsTitle">เลขดังและข่าวสลาก</h2></div><p>ติดตามข้อมูลจากระบบหลักและทดลองแหล่งข่าวเพิ่มเติม</p></div>
+    <div class="labs-toolbar labs-news-toolbar"><button type="button" class="secondary-btn" id="refresh">โหลดข้อมูลล่าสุด</button><label for="filter">แหล่งข่าวเพิ่มเติม</label><select class="draw-select" id="filter"><option value="all">ทุกแหล่ง</option><option value="RANLOTTO">RANLOTTO</option><option value="GNews">GNews</option></select></div>
+    <div class="labs-news-grid">
+      <article class="card labs-card"><div class="card-head"><div><span class="label">LOTTERYCHECKS / PRODUCTION</span><h2>ชุดเลขจากระบบหลัก</h2></div></div><p class="status" id="mainStatus" role="status">กำลังอ่านข้อมูลจากระบบหลัก…</p><div id="picks"></div></article>
+      <article class="card labs-card"><div class="card-head"><div><span class="label">EXPERIMENTAL SOURCES</span><h2>ข่าวจากแหล่งเพิ่มเติม</h2></div></div><p class="labs-muted">เฉพาะชื่อบทความและลิงก์ต้นฉบับ ไม่รวมเข้าคะแนน Algorithm</p><div class="status" id="providerStatus" role="status">กำลังโหลด…</div><div class="labs-articles" id="articles"><p class="labs-muted">รอการเชื่อมต่อ</p></div></article>
+    </div>
+  </section>
+  <section id="details" aria-labelledby="detailsTitle"><div class="section-intro technical-intro"><div><p class="eyebrow">RESEARCH &amp; SYSTEM</p><h2 id="detailsTitle">รายละเอียดการทดลอง</h2></div></div>
+    <details class="card system-diagnostics labs-details"><summary>วิธีทดสอบ Algorithm และการอ่านผล</summary><p>สูตรทดลองใช้หน้าต่างย้อนหลัง 12, 30 และ 80 งวด ผสมความถี่เลขเต็มกับโมเดลรายตำแหน่งแบบ smoothing โดยน้ำหนักกำหนดไว้ล่วงหน้า สำหรับเลข 6 หลักมีเงื่อนไขกระจายเลขหน้า 3 ตัว และท้าย 2 ตัวไม่ซ้ำกัน</p><p>เปรียบเทียบกับ Production v3 (2 ตัว) และ v2 (6 หลัก) ส่วน 3 ตัวใช้สูตรความถี่เป็นตัวอ้างอิง การทดสอบใช้เฉพาะข้อมูลก่อนงวดเป้าหมาย ไม่ใช่ Snapshot ที่เคยประกาศจริง</p><p>ตัวอย่างการอ่านผล 1 / 40 หมายถึงตรงรางวัลอย่างน้อยหนึ่งหมายเลขใน 1 จาก 40 งวด ไม่ใช่จำนวนใบที่ถูก รางวัลที่ 1 นับเลขเต็มตรงกันเท่านั้น ส่วนแถวทุกรางวัลนับงวดที่ข้อมูลครบ 9 ประเภท</p><p>Baseline สุ่มของเลขหน้า/ท้าย 3 ตัวใช้สมมติฐานหมายเลขรางวัลสองชุดต่างกัน ไม่ได้ประเมิน Baseline รวมทุกรางวัลในรุ่นนี้ ผลทดสอบที่มากกว่าหรือน้อยกว่าไม่ได้พิสูจน์ความแม่นยำในอนาคต</p></details>
+    <details class="card system-diagnostics labs-details"><summary>แหล่งข่าวและข้อจำกัด</summary><p><a href="https://lotterychecks.com/" target="_blank" rel="noopener noreferrer">LotteryChecks</a> · <a href="https://www.ranlotto.com/api-docs" target="_blank" rel="noopener noreferrer">RANLOTTO</a> · <a href="https://gnews.io/" target="_blank" rel="noopener noreferrer">GNews</a></p><p>แหล่งข่าวเพิ่มเติมยังอยู่ระหว่างการทดลอง หากไม่มีข่าว ระบบจะแสดงตามจริง ไม่เติมข้อมูลจำลอง โปรดตรวจต้นฉบับและวันที่ของข่าวก่อนนำไปใช้</p><p>ระบบ Labs แยก Apps Script และ Google Sheet จาก Production โดยอ่านผลสลากย้อนหลังผ่าน API เท่านั้น ไม่บันทึกเลขทดลองลง Snapshot จริง</p></details>
+  </section>
+</main>
+<footer><div class="container footer-inner"><span>Lottery Insight · TheLegionZ · <a href="../index.html">หน้าหลัก</a></span><span>ผลทางการให้ยึดสำนักงานสลากกินแบ่งรัฐบาล</span><span class="site-version">Labs UI v0.2.0</span></div></footer>
+<script src="../config.js"></script>
+<script src="labs-config.js"></script>
+<script src="common.js?v=0.2.0"></script>
+<script src="algorithm.js?v=0.2.0"></script>
+<script src="news.js?v=0.2.0"></script>
+</body>
+</html>

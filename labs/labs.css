@@ -1,1 +1,40 @@
-:root{color-scheme:light;--bg:#f8f3eb;--paper:#fffdf9;--ink:#38291f;--muted:#776557;--line:#e7dacc;--accent:#a15132;--gold:#f7dfb4;--green:#276349;--shadow:0 12px 35px #5430210c}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% 0,#f3e0cb,transparent 35%),var(--bg);color:var(--ink);font:15px/1.65 system-ui,sans-serif}header{border-bottom:1px solid var(--line);background:var(--paper)}.nav{max-width:1100px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 20px;flex-wrap:wrap}.logo{height:52px;max-width:240px;object-fit:contain}nav{display:flex;gap:16px;flex-wrap:wrap}a{color:var(--accent);text-underline-offset:3px}nav a{text-decoration:none;font-weight:650}main{max-width:1100px;margin:auto;padding:32px 20px 48px}.eyebrow{font-size:11px;font-weight:800;letter-spacing:.15em;color:var(--accent)}h1{font-size:clamp(28px,4vw,46px);line-height:1.15;margin:8px 0 12px}h2{font-size:21px;margin:0 0 12px}p{margin:10px 0}.muted,small{color:var(--muted)}.panel{padding:22px;background:var(--paper);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);margin-top:18px}.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}button,select{font:inherit;border-radius:10px;padding:9px 14px;border:1px solid var(--line);background:var(--paper);color:var(--ink)}button{background:var(--accent);border-color:transparent;color:white;font-weight:700;cursor:pointer}button:disabled{opacity:.6;cursor:wait}.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.newsitem{border:1px solid var(--line);border-radius:13px;padding:14px;overflow-wrap:anywhere}.newsitem a{font-weight:700}.newsitem small{display:block}.chiplist{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.chip{border-radius:8px;background:#f4e6d6;color:#613820;padding:4px 10px;font-weight:750;font-variant-numeric:tabular-nums}.status{font-size:13px;color:var(--muted);margin:10px 0;overflow-wrap:anywhere}.status.error{color:#ab3b30}.status.ok{color:var(--green)}.table-scroll{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:540px}th,td{border-bottom:1px solid var(--line);padding:11px;text-align:left}th{font-size:12px;color:var(--muted)}footer{max-width:1100px;margin:auto;padding:20px;color:var(--muted);font-size:12px}hr{border:0;border-top:1px solid var(--line);margin:16px 0}@media(max-width:600px){main{padding:20px 12px}.panel{padding:16px}.cards{grid-template-columns:1fr}.logo{height:40px}nav{gap:12px;font-size:13px}}@media(prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#211a16;--paper:#30251f;--ink:#f9eee2;--muted:#c4ad99;--line:#554236;--accent:#efae87;--green:#8ad6a8;--shadow:none}body{background:var(--bg)}button{color:#321c12}.chip{background:#533a29;color:#f6dfbd}.status.error{color:#ffb0a4}}
+/* Labs is intentionally layered on the production Warm Edition stylesheet. */
+.labs-page .labs-tag{background:var(--accent-soft);color:var(--accent);font-weight:800;font-size:11px;padding:6px 10px;border-radius:999px}
+.labs-page .labs-banner{display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:144px}
+.labs-page .labs-banner h2{font-size:clamp(21px,3vw,29px);line-height:1.3;margin:7px 0}
+.labs-page .labs-banner p:not(.label){font-size:13px;margin:0;color:var(--muted)}
+.labs-page .labs-banner-link{color:#613820;background:#f7dfb4;text-decoration:none;white-space:nowrap;padding:12px 18px;border-radius:10px;font-size:14px;font-weight:800}
+.labs-page .labs-card{padding:24px;min-width:0}
+.labs-page .labs-muted{font-size:13px;color:var(--muted);line-height:1.65;overflow-wrap:anywhere}
+.labs-page .labs-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.labs-page .labs-test-controls{margin:20px 0 0;padding:16px;border:1px solid var(--line);background:var(--surface-soft);border-radius:12px}
+.labs-page .labs-toolbar label{font-size:13px;font-weight:700;color:var(--muted)}
+.labs-page .labs-toolbar .draw-select{width:auto;min-width:110px;background:var(--surface);color:var(--text);border:1px solid var(--line);padding:9px 12px;min-height:42px}
+.labs-page .labs-toolbar button{min-height:42px}
+.labs-page .labs-toolbar button:disabled{opacity:.65;cursor:wait}
+.labs-page .status{color:var(--muted);font-size:13px;overflow-wrap:anywhere;margin:12px 0;line-height:1.65}
+.labs-page .status.error{color:var(--accent);background:var(--accent-soft);border-radius:9px;padding:9px 12px}
+.labs-page .status.ok{color:var(--green)}
+.labs-page .labs-table{border:1px solid var(--line);border-radius:12px;margin:15px 0;max-width:100%}
+.labs-page .labs-table table{min-width:650px}
+.labs-page .labs-table th:first-child{width:28%}
+.labs-page .labs-table td{font-variant-numeric:tabular-nums;vertical-align:top}
+.labs-page .labs-results{background:var(--surface-soft);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:14px 0;font-size:13px;color:var(--muted)}
+.labs-page .labs-results[hidden]{display:none}
+.labs-page .labs-results strong{color:var(--text);display:block;margin-bottom:4px}
+.labs-page .labs-results p{margin:4px 0}
+.labs-page .labs-news-toolbar{margin-bottom:14px}
+.labs-page .labs-news-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+.labs-page .chiplist{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 16px}
+.labs-page .chip{font-size:21px;font-weight:800;font-variant-numeric:tabular-nums;padding:8px 13px;border-radius:10px;background:var(--accent-soft);color:var(--accent)}
+.labs-page #picks p{font-size:13px;overflow-wrap:anywhere;border-top:1px solid var(--line);padding-top:10px;margin:10px 0}
+.labs-page #picks a,.labs-page .newsitem a,.labs-page .labs-details a{color:var(--accent);font-weight:700;text-underline-offset:3px}
+.labs-page .labs-articles{display:grid;gap:10px}
+.labs-page .newsitem{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--surface-soft);overflow-wrap:anywhere}
+.labs-page .newsitem small{display:block;color:var(--muted);margin-top:5px}
+.labs-page .labs-details{margin:10px 0;padding:16px 22px}
+.labs-page .labs-details summary{font-weight:750;cursor:pointer}
+.labs-page .labs-details p{font-size:13px;color:var(--muted)}
+@media(max-width:850px){.labs-page .labs-news-grid{grid-template-columns:1fr}.labs-page .labs-card{padding:20px}}
+@media(max-width:560px){.labs-page .labs-banner{align-items:flex-start;flex-direction:column;gap:14px}.labs-page .labs-card{padding:16px;border-radius:15px}.labs-page .labs-test-controls{padding:12px}.labs-page .labs-test-controls label{flex-basis:100%}.labs-page .labs-test-controls button{flex:1;min-width:0}.labs-page .labs-toolbar .draw-select{min-width:95px}.labs-page .labs-tag{font-size:10px;padding:5px 7px}.labs-page .labs-details{padding:14px 16px}}
+@media(max-width:360px){.labs-page .labs-test-controls button{flex-basis:100%}}
