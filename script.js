@@ -234,6 +234,7 @@ function renderPrediction(){
       `<div class="candidate"><strong>${esc(n)}</strong><span>score ${Number((p.scores||[])[i]||0).toFixed(1)}</span></div>`
     ).join("");
   }else{
+    $("#predictionSub").textContent="รอข้อมูลการคาดการณ์";
     $("#candidateList").innerHTML=`<div class="candidate"><strong>—</strong><span>กำลังสร้าง Candidate ชุดใหม่</span></div>`;
     $("#excludedLast2").textContent=state.results[0]?.last2||"—";
   }

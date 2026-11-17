@@ -1,460 +1,393 @@
 <!DOCTYPE html>
+
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="สถิติผลสลากย้อนหลัง ตรวจรางวัล และบันทึกการคาดการณ์แบบตรวจสอบย้อนหลังได้">
-  <title>Lottery Insight · TheLegionZ</title>
-  <link rel="stylesheet" href="style.css?v=5.3.2">
-  <link rel="icon" href="assets/favicon.ico?v=5.3.2" sizes="any">
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=5.3.2">
-  <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png?v=5.3.2">
-  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=5.3.2">
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="สถิติผลสลากย้อนหลัง ตรวจรางวัล และบันทึกการคาดการณ์แบบตรวจสอบย้อนหลังได้" name="description"/>
+<title>Lottery Insight · TheLegionZ</title>
+<link href="style.css?v=5.4.0" rel="stylesheet"/>
+<link href="assets/favicon.ico?v=5.4.0" rel="icon" sizes="any"/>
+<link href="assets/favicon-32.png?v=5.4.0" rel="icon" sizes="32x32" type="image/png"/>
+<link href="assets/favicon-192.png?v=5.4.0" rel="icon" sizes="192x192" type="image/png"/>
+<link href="assets/apple-touch-icon.png?v=5.4.0" rel="apple-touch-icon" sizes="180x180"/>
 </head>
 <body>
-  <div id="pageLoader" class="page-loader" aria-live="polite">
-    <div class="loader-card">
-      <div class="loader-mark"><img src="assets/favicon-192.png?v=5.3.2" alt="" aria-hidden="true"></div>
-      <div class="loader-spinner" aria-hidden="true"></div>
-      <strong>กำลังโหลด Lottery Insight</strong>
-      <span id="pageLoaderText">กำลังเชื่อมต่อข้อมูลล่าสุด...</span>
-    </div>
-  </div>
-  <header class="topbar">
-    <div class="container topbar-inner">
-      <a class="brand brand-logo" href="#" aria-label="Lottery Insight">
-        <img src="assets/lottery-insight-logo.png?v=5.3.2" alt="Lottery Insight by TheLegionZ">
-      </a>
-      <div class="header-actions">
-        <a class="nav-link news-nav" href="#news">เลขดังจากข่าว</a>
-        <a class="nav-link" href="#check">ตรวจรางวัล</a>
-        <span id="statusPill" class="status-pill"><i></i><span id="statusText">กำลังโหลด</span></span>
-        <button id="themeBtn" class="icon-btn" aria-label="เปลี่ยน Theme">🌙</button>
-      </div>
-    </div>
-  </header>
+<div aria-live="polite" class="page-loader" id="pageLoader">
+<div class="loader-card">
+<div class="loader-mark"><img alt="" aria-hidden="true" src="assets/favicon-192.png?v=5.4.0"/></div>
+<div aria-hidden="true" class="loader-spinner"></div>
+<strong>กำลังโหลด Lottery Insight</strong>
+<span id="pageLoaderText">กำลังเชื่อมต่อข้อมูลล่าสุด...</span>
+</div>
+</div>
+<header class="topbar">
+<div class="container topbar-inner">
+<a aria-label="Lottery Insight" class="brand brand-logo" href="#">
+<img alt="Lottery Insight by TheLegionZ" src="assets/lottery-insight-logo.png?v=5.4.0"/>
+</a>
+<nav aria-label="เมนูหลัก" class="main-nav"><a href="#latest">ผลล่าสุด</a><a href="#check">ตรวจรางวัล</a><a href="#news">เลขดังจากข่าว</a><a href="#history">ผลย้อนหลัง</a><a href="#system">สถิติระบบ</a></nav><div class="header-actions">
 
-    <div id="connectionAlert" class="connection-alert container" role="alert" hidden>
-    <div class="connection-alert-copy">
-      <strong id="connectionAlertTitle">เชื่อมต่อข้อมูลไม่ได้</strong>
-      <p id="connectionAlertText"></p>
-    </div>
-    <div class="connection-alert-actions">
-      <button id="retryConnectionBtn" type="button">ลองอีกครั้ง</button>
-      <a id="connectionHealthLink" href="#" target="_blank" rel="noopener noreferrer" hidden>ตรวจสอบ Backend</a>
-    </div>
-  </div>
 
-  <main class="container">
-    <section class="warning">
-      <strong>เพื่อดูสถิติและทดลองสูตรเท่านั้น</strong>
-      <span>Stat score ไม่ใช่โอกาสถูกรางวัล ผลแต่ละงวดเป็นอิสระ และไม่ควรใช้เว็บไซต์นี้เป็นคำแนะนำในการซื้อสลาก</span>
-    </section>
+<span class="status-pill" id="statusPill"><i></i><span id="statusText">กำลังโหลด</span></span>
+<button aria-label="เปลี่ยน Theme" class="icon-btn" id="themeBtn">🌙</button>
+</div>
+</div>
+</header>
+<div class="connection-alert container" hidden="" id="connectionAlert" role="alert">
+<div class="connection-alert-copy">
+<strong id="connectionAlertTitle">เชื่อมต่อข้อมูลไม่ได้</strong>
+<p id="connectionAlertText"></p>
+</div>
+<div class="connection-alert-actions">
+<button id="retryConnectionBtn" type="button">ลองอีกครั้ง</button>
+<a hidden="" href="#" id="connectionHealthLink" rel="noopener noreferrer" target="_blank">ตรวจสอบ Backend</a>
+</div>
+</div>
+<main class="container"><div class="welcome" id="home"><div><p class="eyebrow">LOTTERY INSIGHT</p><h1>ผลสลากและตรวจรางวัล</h1><p>ดูผลล่าสุด ตรวจสลากหลายใบ และติดตามข้อมูลย้อนหลังในที่เดียว</p></div><a class="official-link" href="https://www.glo.or.th/mission/reward-payment/check-reward" rel="noopener noreferrer" target="_blank">สำนักงานสลากกินแบ่งรัฐบาล ↗</a></div><section aria-label="ผลล่าสุดและตรวจรางวัล" class="user-grid"><article class="card result-card" id="latest">
+<div class="card-head">
+<div>
+<span class="label">ผลสลากงวดล่าสุด</span>
+<h2 id="latestDate">—</h2>
+</div>
 
-    <section class="hero-grid">
-      <article class="card result-card">
-        <div class="card-head">
-          <div>
-            <span class="label">ผลล่าสุด</span>
-            <h1 id="latestDate">—</h1>
-          </div>
-          <span class="live-badge">LIVE DATA</span>
-        </div>
+</div>
+<div class="result-grid">
+<div>
+<span>รางวัลที่ 1</span>
+<strong id="firstPrize">------</strong>
+</div>
+<div class="last2-box">
+<span>เลขท้าย 2 ตัว</span>
+<strong id="last2">--</strong>
+</div>
+</div>
+<div class="latest-prize-panel">
+<div class="latest-prize-title">
+<strong>รางวัลอื่นในงวดนี้</strong>
 
-        <div class="result-grid">
-          <div>
-            <span>รางวัลที่ 1</span>
-            <strong id="firstPrize">------</strong>
-          </div>
-          <div class="last2-box">
-            <span>เลขท้าย 2 ตัว</span>
-            <strong id="last2">--</strong>
-          </div>
-        </div>
+</div>
+<div class="latest-prize-grid">
+<div class="latest-prize-group">
+<div class="latest-prize-label">
+<span>เลขหน้า 3 ตัว</span>
+<small id="front3Amount"></small>
+</div>
+<div class="latest-prize-numbers" id="front3Numbers">
+<b>---</b><b>---</b>
+</div>
+</div>
+<div class="latest-prize-group">
+<div class="latest-prize-label">
+<span>เลขท้าย 3 ตัว</span>
+<small id="back3Amount"></small>
+</div>
+<div class="latest-prize-numbers" id="back3Numbers">
+<b>---</b><b>---</b>
+</div>
+</div>
+</div>
+<div class="latest-prize-adjacent" hidden="" id="adjacentFirstGroup">
+<div class="latest-prize-label">
+<span>ข้างเคียงรางวัลที่ 1</span>
+<small id="adjacentFirstAmount"></small>
+</div>
+<div class="latest-adjacent-numbers" id="adjacentFirstNumbers"></div>
+</div>
+</div>
+<div class="result-footer">
+<span id="lastSync">ยังไม่พบข้อมูล</span>
+<a href="https://www.glo.or.th/" rel="noreferrer" target="_blank">ตรวจผลกับ GLO ↗</a>
+</div>
+</article><section class="card checker-card" id="check">
+<div class="section-head checker-head">
+<div>
+<span class="label">ตรวจสลากของคุณ</span>
+<h2>ตรวจรางวัล</h2>
+</div>
+<span class="batch-badge" id="ticketCount">1 ช่อง</span>
+</div>
+<div class="multi-check-layout textbox-layout"><div class="draw-check-panel compact-check-panel">
+<label class="field-label" for="ticketDate">
+<span>งวดวันที่</span>
+<small>เลือกจากงวดที่มีข้อมูล</small>
+</label>
+<select class="draw-select" id="ticketDate">
+<option value="">กำลังโหลดงวด...</option>
+</select>
 
-        <div class="latest-prize-panel">
-          <div class="latest-prize-title">
-            <strong>รางวัลเลขชุดย่อย</strong>
-            <small>งวดล่าสุด</small>
-          </div>
+</div><div class="ticket-entry-panel">
+<div class="field-label">
+<span>เลขสลาก 6 หลัก</span>
+<small>กรอกตัวเลขเท่านั้น ช่องละ 1 ใบ</small>
+</div>
+<div class="ticket-input-list" id="ticketInputs">
+<div class="ticket-input-row" data-ticket-row="">
+<span class="ticket-index">1</span>
+<input aria-label="เลขสลากใบที่ 1" autocomplete="off" class="ticket-number-input" inputmode="numeric" maxlength="6" pattern="[0-9]*" placeholder="กรอกเลข 6 หลัก" type="text"/>
+</div>
+</div>
+<div class="ticket-actions">
+<button class="add-ticket-btn" id="addTicketBtn" type="button">+ เพิ่มเลข</button>
+<button class="text-action" id="clearTicketsBtn" type="button">ล้างทั้งหมด</button>
+</div>
+</div><button class="primary-btn check-all-btn" id="checkPrizeBtn" type="button">
+            ตรวจรางวัลทั้งหมด
+          </button></div>
+<p class="checker-note">
+        กรุณาตรวจสอบเลขและงวดก่อนกดตรวจรางวัล ผลเพื่อการใช้งานจริงให้ยึดประกาศสำนักงานสลากกินแบ่งรัฐบาล
+      </p>
+</section></section><div class="section-intro" id="explore"><div><p class="eyebrow">สำรวจข้อมูล</p><h2>ติดตามข้อมูลสลาก</h2></div><p>ข่าวและผลย้อนหลัง แยกจากผลคาดการณ์ของระบบ</p></div><section aria-labelledby="newsTitle" class="card news-card" id="news">
+<div class="section-head news-head">
+<div>
+<span class="label">จากแหล่งข่าว</span>
+<h2 id="newsTitle">เลขดังจากข่าว</h2>
+<p class="news-intro">เลขที่สำนักต่าง ๆ ระบุไว้สำหรับงวดที่ติดตาม</p>
+</div>
+<span class="news-status" id="newsStatus">รอข้อมูลข่าว</span>
+</div>
+<div class="news-meta">
+<span id="newsPeriod">งวดที่ติดตาม —</span>
+<span id="newsLastSync">ยังไม่มีข้อมูลอัปเดต</span>
+</div>
+<div class="news-layout">
+<div class="news-trends">
+<div class="news-trend-panel">
+<div class="news-subhead"><strong>เลขท้าย 2 ตัวที่เป็นข่าว</strong><small>เรียงตามข้อมูลจากแหล่งข่าว</small></div>
+<div aria-live="polite" class="news-chips" id="newsTop2"><span class="news-empty">รอการรวบรวมข่าว</span></div>
+</div>
+<div class="news-trend-panel">
+<div class="news-subhead"><strong>เลข 3 ตัวที่เป็นข่าว</strong><small>เรียงตามข้อมูลจากแหล่งข่าว</small></div>
+<div class="news-chips" id="newsTop3"><span class="news-empty">รอการรวบรวมข่าว</span></div>
+</div>
 
-          <div class="latest-prize-grid">
-            <div class="latest-prize-group">
-              <div class="latest-prize-label">
-                <span>เลขหน้า 3 ตัว</span>
-                <small id="front3Amount"></small>
-              </div>
-              <div id="front3Numbers" class="latest-prize-numbers">
-                <b>---</b><b>---</b>
-              </div>
-            </div>
+<div class="news-disclaimer">จำนวนครั้งที่กล่าวถึงไม่ใช่โอกาสถูกรางวัล</div>
+</div>
+<div class="news-source-panel">
+<div class="news-subhead"><strong>สำนักที่รวบรวมได้</strong><small id="newsArticleCount">0 แหล่ง</small></div>
 
-            <div class="latest-prize-group">
-              <div class="latest-prize-label">
-                <span>เลขท้าย 3 ตัว</span>
-                <small id="back3Amount"></small>
-              </div>
-              <div id="back3Numbers" class="latest-prize-numbers">
-                <b>---</b><b>---</b>
-              </div>
-            </div>
-          </div>
+<div class="news-articles" id="newsArticles"><p class="news-empty">ยังไม่มีข่าวที่ผ่านเกณฑ์การแยกเลข</p></div>
+</div>
+</div>
+<p class="news-disclaimer">ข้อมูลเลขดังรวบรวมจาก <a href="https://lotterychecks.com/lucky-picks" rel="noopener noreferrer" target="_blank">LotteryChecks</a> โดยแยกชุดเลขตามสำนักที่ระบุไว้ในต้นทาง ไม่ใช่ผลรางวัลทางการหรือคำรับประกันว่าจะออก</p>
 
-          <div id="adjacentFirstGroup" class="latest-prize-adjacent" hidden>
-            <div class="latest-prize-label">
-              <span>ข้างเคียงรางวัลที่ 1</span>
-              <small id="adjacentFirstAmount"></small>
-            </div>
-            <div id="adjacentFirstNumbers" class="latest-adjacent-numbers"></div>
-          </div>
-        </div>
+</section><section class="section" id="history">
+<div class="section-head">
+<div>
+<span class="label">ผลสลากย้อนหลัง</span>
+<h2>ประวัติผลสลาก <small class="history-count" id="historyCount"></small></h2>
+</div>
+<button class="secondary-btn" id="reloadBtn">↻ โหลดใหม่</button>
+</div>
+<div class="table-wrap card history-card">
+<table>
+<thead><tr><th>งวดวันที่</th><th>รางวัลที่ 1</th><th>เลขท้าย 2 ตัว</th></tr></thead>
+<tbody id="historyBody"></tbody>
+</table>
+</div>
+</section><section class="section" id="statistics">
+<div class="section-head responsive-head">
+<div>
+<span class="label">สถิติย้อนหลัง</span>
+<h2>เลขออกมาก / ออกน้อย</h2>
+</div>
+<div class="tabs" id="rangeTabs">
+<button data-range="10">10 งวด</button>
+<button data-range="20">20 งวด</button>
+<button class="active" data-range="50">50 งวด</button>
+<button data-range="all">ทั้งหมด</button>
+</div>
+</div>
+<div class="stats-grid">
+<article class="card stat-card">
+<span class="mini-title">ออกบ่อย</span>
+<div class="number-chips" id="hotNumbers"></div>
+</article>
+<article class="card stat-card">
+<span class="mini-title">ออกน้อย</span>
+<div class="number-chips" id="coldNumbers"></div>
+</article>
+<article class="card stat-card chart-card">
+<span class="mini-title">ความถี่ตัวเลข 0–9</span>
+<div class="digit-chart" id="digitChart"></div>
+</article>
+</div>
+</section><div class="section-intro technical-intro" id="system"><div><p class="eyebrow">STATISTICS LAB</p><h2>การทดลองและติดตามผลระบบ</h2></div><p>ข้อมูลสำหรับประเมินสูตร ไม่ใช่คำแนะนำในการซื้อสลาก</p></div><section class="warning">
+<strong>เพื่อดูสถิติและทดลองสูตรเท่านั้น</strong>
+<span>Stat score ไม่ใช่โอกาสถูกรางวัล ผลแต่ละงวดเป็นอิสระ และไม่ควรใช้เว็บไซต์นี้เป็นคำแนะนำในการซื้อสลาก</span>
+</section><article class="card prediction-card" id="prediction">
+<div class="card-head">
+<div>
+<span class="label">การคาดการณ์เชิงทดลอง</span>
+<h2 id="predictionSub">รอข้อมูลการคาดการณ์</h2>
+</div>
+<span class="snapshot-badge">บันทึกก่อนออกผล</span>
+</div>
 
-        <div class="result-footer">
-          <span id="lastSync">ยังไม่พบข้อมูล</span>
-          <a href="https://www.glo.or.th/" target="_blank" rel="noreferrer">ตรวจผลกับ GLO ↗</a>
-        </div>
-      </article>
 
-      <article class="card prediction-card">
-        <div class="card-head">
-          <div>
-            <span class="label">งวดหน้า คาดว่าจะออกอะไร</span>
-            <h2 id="predictionSub">รอการคำนวณ</h2>
-          </div>
-          <span class="snapshot-badge">SNAPSHOT</span>
-        </div>
 
-        <div class="prediction-block">
-          <div class="prediction-block-head">
-            <strong>เลขท้าย 2 ตัว</strong>
-            
-          </div>
-          <div id="candidateList" class="candidate-list"></div>
-          <div class="exclude-note">
-            <span>ตัดเลขงวดล่าสุด</span>
-            <strong id="excludedLast2">—</strong>
-          </div>
-        </div>
-
-        <div class="prediction-block six-block">
-          <div class="prediction-block-head">
-            <strong>เลขสลาก 6 หลัก</strong>
-            
-          </div>
-          <div id="candidate6List" class="candidate6-list"></div>
-          <div class="exclude-note">
-            <span>ตัดรางวัลที่ 1 งวดล่าสุด</span>
-            <strong id="excludedFirstPrize">—</strong>
-          </div>
-        </div>
-
-        <details class="logic-details">
-          <summary>เลือกเลขอย่างไร?</summary>
-          <div class="logic-two-col">
-            <div>
-              <b>2 ตัว</b>
-              <span>หลายโมเดลทดสอบย้อนหลังแบบไม่เห็นอนาคต แล้วรวมคะแนนเป็น Ensemble สำหรับงวดถัดไป</span>
-            </div>
-            <div>
-              <b>6 หลัก</b>
-              <span>ตำแหน่ง 6 หลัก + คู่เลขติดกัน + หน้า 3 + ท้าย 3 + ท้าย 2 แล้ว Diversity re-ranking</span>
-            </div>
-          </div>
-          <p>
+<div class="prediction-columns"><div class="prediction-block">
+<div class="prediction-block-head">
+<strong>เลขท้าย 2 ตัว</strong>
+</div>
+<div class="candidate-list" id="candidateList"></div>
+<div class="exclude-note">
+<span>ตัดเลขงวดล่าสุด</span>
+<strong id="excludedLast2">—</strong>
+</div>
+</div><div class="prediction-block six-block">
+<div class="prediction-block-head">
+<strong>เลขสลาก 6 หลัก</strong>
+</div>
+<div class="candidate6-list" id="candidate6List"></div>
+<div class="exclude-note">
+<span>ตัดรางวัลที่ 1 งวดล่าสุด</span>
+<strong id="excludedFirstPrize">—</strong>
+</div>
+</div></div><div class="news-overlap" hidden="" id="newsOverlap"></div></article><section class="card audit-card" id="audit">
+<div class="section-head">
+<div>
+<span class="label">ผลตรวจสอบย้อนหลัง</span>
+<h2>ผลการคาดการณ์ที่ผ่านมา</h2>
+</div>
+</div>
+<div class="audit-subsection">
+<div class="audit-subhead">
+<strong>เลขท้าย 2 ตัว</strong>
+<span class="audit-badge pending" id="auditBadge">รอผล</span>
+</div>
+<div class="audit-grid">
+<div><span>เลขที่คาดไว้</span><strong id="auditCandidates">—</strong></div>
+<div><span>ผลจริง</span><strong id="auditActual">—</strong></div>
+<div><span>ผลตรวจ</span><strong id="auditResult">ยังไม่มีงวดให้ตรวจ</strong></div>
+<div><span>Snapshot เมื่อ</span><strong id="auditCreated">—</strong></div>
+</div>
+<div class="repeat-alert" hidden="" id="repeatExplanation">
+<strong>งวดนี้ออกซ้ำเลขเดิมจากงวดก่อน</strong>
+<span>ตามกติกาที่ตั้งไว้ ระบบตัดเลขงวดล่าสุดออก จึงไม่มีทางเลือกเลขนี้เป็น Candidate ในรอบดังกล่าว</span>
+</div>
+</div>
+<div class="audit-subsection audit-six">
+<div class="audit-subhead">
+<strong>เลขสลาก 6 หลัก</strong>
+<span class="audit-badge pending" id="audit6Badge">รอผล</span>
+</div>
+<div class="audit-grid">
+<div><span>Candidate</span><strong id="audit6Candidates">—</strong></div>
+<div><span>รางวัลที่ 1 จริง</span><strong id="audit6Actual">—</strong></div>
+<div><span>มีถูกรางวัลไหม</span><strong id="audit6Result">ยังไม่มีงวดให้ตรวจ</strong></div>
+<div><span>Snapshot เมื่อ</span><strong id="audit6Created">—</strong></div>
+</div>
+</div>
+<details>
+<summary>ดูประวัติเลขท้าย 2 ตัว</summary>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>งวดที่ตรวจ</th><th>คาดไว้</th><th>เลขจริง</th><th>ผล</th><th>หมายเหตุ</th></tr>
+</thead>
+<tbody id="auditHistory"></tbody>
+</table>
+</div>
+</details>
+<details>
+<summary>ดูประวัติเลข 6 หลัก</summary>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>งวดที่ตรวจ</th><th>Candidate</th><th>รางวัลที่ 1</th><th>ผลตรวจ Candidate</th><th>สถานะ</th></tr>
+</thead>
+<tbody id="audit6History"></tbody>
+</table>
+</div>
+</details>
+<details class="news-audit-details">
+<summary>ผลตรวจเลขดังจากข่าวย้อนหลัง</summary>
+<div class="table-wrap">
+<table>
+<thead><tr><th>งวดที่ตรวจ</th><th>เลข 2 ตัวจากข่าว</th><th>ผลจริง</th><th>ผลตรวจ 2 ตัว</th><th>ตรวจเลข 3 ตัว</th></tr></thead>
+<tbody id="newsAuditHistory"><tr><td colspan="5">ยังไม่มี Snapshot ที่ตรวจผลแล้ว</td></tr></tbody>
+</table>
+</div>
+</details></section><section class="card algorithm-card" id="algorithm">
+<div class="section-head algorithm-head">
+<div>
+<span class="label">Algorithm Performance</span>
+<h2>Walk-forward Backtest</h2>
+<p class="algorithm-subtitle">ทดสอบทีละงวดโดยใช้เฉพาะข้อมูลที่มีอยู่ก่อนงวดนั้น</p>
+</div>
+<span class="snapshot-badge" id="algoVersionBadge">ENSEMBLE V3</span>
+</div>
+<div class="algorithm-kpis">
+<div class="algorithm-kpi primary">
+<span>Ensemble Top-5</span>
+<strong id="algoEnsembleRate">—</strong>
+<small id="algoEnsembleHits">รอข้อมูล</small>
+</div>
+<div class="algorithm-kpi">
+<span>Random baseline</span>
+<strong id="algoBaseline">5.0%</strong>
+<small>Top 5 จาก 00–99</small>
+</div>
+<div class="algorithm-kpi">
+<span>งวดที่ทดสอบ</span>
+<strong id="algoTests">—</strong>
+<small>Walk-forward</small>
+</div>
+<div class="algorithm-kpi">
+<span>Model เดี่ยวที่ดีที่สุด</span>
+<strong id="algoBestModel">—</strong>
+<small id="algoBestRate">—</small>
+</div>
+</div>
+<div class="algorithm-edge neutral" id="algoEdgeNote">ยังไม่มีข้อมูล Backtest เพียงพอ</div>
+<details class="algorithm-details">
+<summary>ดู Algorithm Arena</summary>
+<div class="table-wrap algorithm-table-wrap">
+<table>
+<thead><tr><th>Model</th><th>Top-5 Hit</th><th>Hit rate</th><th>น้ำหนักงวดหน้า</th></tr></thead>
+<tbody id="algoModelBody"><tr><td colspan="4">รอข้อมูล</td></tr></tbody>
+</table>
+</div>
+<p class="algorithm-footnote">น้ำหนักถูกปรับแบบ conservative และมี prior ใกล้ baseline เพื่อลดการไล่ตามผลชนะระยะสั้น</p>
+</details>
+<details class="logic-details">
+<summary>เลือกเลขอย่างไร?</summary>
+<div class="logic-two-col">
+<div>
+<b>2 ตัว</b>
+<span>หลายโมเดลทดสอบย้อนหลังแบบไม่เห็นอนาคต แล้วรวมคะแนนเป็น Ensemble สำหรับงวดถัดไป</span>
+</div>
+<div>
+<b>6 หลัก</b>
+<span>ตำแหน่ง 6 หลัก + คู่เลขติดกัน + หน้า 3 + ท้าย 3 + ท้าย 2 แล้ว Diversity re-ranking</span>
+</div>
+</div>
+<p>
             ใช้ข้อมูลย้อนหลังที่มีในระบบแบบ Walk-forward โดยแต่ละงวดใช้เฉพาะข้อมูลก่อนหน้านั้น
             ไม่มี Random และคัด Top 5 แบบกระจายความซ้ำ ทั้งเลข 2 ตัวและ 6 หลัก ก่อน Lock Snapshot รอผล
             <b>Stat score เป็นคะแนนจัดอันดับ ไม่ใช่ Probability</b>
-          </p>
-        </details>
-      </article>
-    </section>
-
-    <section class="card checker-card" id="check">
-      <div class="section-head checker-head">
-        <div>
-          <span class="label">ตรวจรางวัลย้อนหลัง</span>
-          <h2>ตรวจหลายเลขในงวดเดียว</h2>
-        </div>
-        <span id="ticketCount" class="batch-badge">1 ช่อง</span>
-      </div>
-
-      <div class="multi-check-layout textbox-layout">
-        <div class="ticket-entry-panel">
-          <div class="field-label">
-            <span>เลขสลาก 6 หลัก</span>
-            <small>กรอกตัวเลขเท่านั้น ช่องละ 1 ใบ</small>
-          </div>
-
-          <div id="ticketInputs" class="ticket-input-list">
-            <div class="ticket-input-row" data-ticket-row>
-              <span class="ticket-index">1</span>
-              <input
-                class="ticket-number-input"
-                type="text"
-                inputmode="numeric"
-                pattern="[0-9]*"
-                maxlength="6"
-                autocomplete="off"
-                placeholder="กรอกเลข 6 หลัก"
-                aria-label="เลขสลากใบที่ 1">
-            </div>
-          </div>
-
-          <div class="ticket-actions">
-            <button id="addTicketBtn" class="add-ticket-btn" type="button">+ เพิ่มเลข</button>
-            <button id="clearTicketsBtn" class="text-action" type="button">ล้างทั้งหมด</button>
-          </div>
-        </div>
-
-        <div class="draw-check-panel compact-check-panel">
-          <label class="field-label" for="ticketDate">
-            <span>งวดวันที่</span>
-            <small>เลือกจากงวดที่มีข้อมูล</small>
-          </label>
-
-          <select id="ticketDate" class="draw-select">
-            <option value="">กำลังโหลดงวด...</option>
-          </select>
-
-          <button id="checkPrizeBtn" class="primary-btn check-all-btn" type="button">
-            ตรวจรางวัลทั้งหมด
-          </button>
-        </div>
-      </div>
-
-      <p class="checker-note">
-        กรุณาตรวจสอบเลขและงวดก่อนกดตรวจรางวัล ผลเพื่อการใช้งานจริงให้ยึดประกาศสำนักงานสลากกินแบ่งรัฐบาล
-      </p>
-    </section>
-
-    <section class="card audit-card">
-      <div class="section-head">
-        <div>
-          <span class="label">Prediction Audit</span>
-          <h2>งวดก่อนที่ระบบคาดไว้เป็นอย่างไร?</h2>
-        </div>
-      </div>
-
-      <div class="audit-subsection">
-        <div class="audit-subhead">
-          <strong>เลขท้าย 2 ตัว</strong>
-          <span id="auditBadge" class="audit-badge pending">รอผล</span>
-        </div>
-        <div class="audit-grid">
-          <div><span>เลขที่คาดไว้</span><strong id="auditCandidates">—</strong></div>
-          <div><span>ผลจริง</span><strong id="auditActual">—</strong></div>
-          <div><span>ผลตรวจ</span><strong id="auditResult">ยังไม่มีงวดให้ตรวจ</strong></div>
-          <div><span>Snapshot เมื่อ</span><strong id="auditCreated">—</strong></div>
-        </div>
-
-        <div id="repeatExplanation" class="repeat-alert" hidden>
-          <strong>งวดนี้ออกซ้ำเลขเดิมจากงวดก่อน</strong>
-          <span>ตามกติกาที่ตั้งไว้ ระบบตัดเลขงวดล่าสุดออก จึงไม่มีทางเลือกเลขนี้เป็น Candidate ในรอบดังกล่าว</span>
-        </div>
-      </div>
-
-      <div class="audit-subsection audit-six">
-        <div class="audit-subhead">
-          <strong>เลขสลาก 6 หลัก</strong>
-          <span id="audit6Badge" class="audit-badge pending">รอผล</span>
-        </div>
-        <div class="audit-grid">
-          <div><span>Candidate</span><strong id="audit6Candidates">—</strong></div>
-          <div><span>รางวัลที่ 1 จริง</span><strong id="audit6Actual">—</strong></div>
-          <div><span>มีถูกรางวัลไหม</span><strong id="audit6Result">ยังไม่มีงวดให้ตรวจ</strong></div>
-          <div><span>Snapshot เมื่อ</span><strong id="audit6Created">—</strong></div>
-        </div>
-      </div>
-
-      <details>
-        <summary>ดูประวัติเลขท้าย 2 ตัว</summary>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr><th>งวดที่ตรวจ</th><th>คาดไว้</th><th>เลขจริง</th><th>ผล</th><th>หมายเหตุ</th></tr>
-            </thead>
-            <tbody id="auditHistory"></tbody>
-          </table>
-        </div>
-      </details>
-
-      <details>
-        <summary>ดูประวัติเลข 6 หลัก</summary>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr><th>งวดที่ตรวจ</th><th>Candidate</th><th>รางวัลที่ 1</th><th>ผลตรวจ Candidate</th><th>สถานะ</th></tr>
-            </thead>
-            <tbody id="audit6History"></tbody>
-          </table>
-        </div>
-      </details>
-    </section>
-
-    <section class="card algorithm-card">
-      <div class="section-head algorithm-head">
-        <div>
-          <span class="label">Algorithm Performance</span>
-          <h2>Walk-forward Backtest</h2>
-          <p class="algorithm-subtitle">ทดสอบทีละงวดโดยใช้เฉพาะข้อมูลที่มีอยู่ก่อนงวดนั้น</p>
-        </div>
-        <span id="algoVersionBadge" class="snapshot-badge">ENSEMBLE V3</span>
-      </div>
-
-      <div class="algorithm-kpis">
-        <div class="algorithm-kpi primary">
-          <span>Ensemble Top-5</span>
-          <strong id="algoEnsembleRate">—</strong>
-          <small id="algoEnsembleHits">รอข้อมูล</small>
-        </div>
-        <div class="algorithm-kpi">
-          <span>Random baseline</span>
-          <strong id="algoBaseline">5.0%</strong>
-          <small>Top 5 จาก 00–99</small>
-        </div>
-        <div class="algorithm-kpi">
-          <span>งวดที่ทดสอบ</span>
-          <strong id="algoTests">—</strong>
-          <small>Walk-forward</small>
-        </div>
-        <div class="algorithm-kpi">
-          <span>Model เดี่ยวที่ดีที่สุด</span>
-          <strong id="algoBestModel">—</strong>
-          <small id="algoBestRate">—</small>
-        </div>
-      </div>
-
-      <div id="algoEdgeNote" class="algorithm-edge neutral">ยังไม่มีข้อมูล Backtest เพียงพอ</div>
-
-      <details class="algorithm-details">
-        <summary>ดู Algorithm Arena</summary>
-        <div class="table-wrap algorithm-table-wrap">
-          <table>
-            <thead><tr><th>Model</th><th>Top-5 Hit</th><th>Hit rate</th><th>น้ำหนักงวดหน้า</th></tr></thead>
-            <tbody id="algoModelBody"><tr><td colspan="4">รอข้อมูล</td></tr></tbody>
-          </table>
-        </div>
-        <p class="algorithm-footnote">น้ำหนักถูกปรับแบบ conservative และมี prior ใกล้ baseline เพื่อลดการไล่ตามผลชนะระยะสั้น</p>
-      </details>
-    </section>
-
-    <section class="card news-card" id="news" aria-labelledby="newsTitle">
-      <div class="section-head news-head">
-        <div>
-          <span class="label">News Intelligence · Experimental</span>
-          <h2 id="newsTitle">เลขดังจากข่าว</h2>
-          <p class="news-intro">เลขจากแหล่งข้อมูลที่ระบุประเภท 2/3 ตัวชัดเจน พร้อมงวดและลิงก์ต้นฉบับ</p>
-        </div>
-        <span id="newsStatus" class="news-status">รอข้อมูลข่าว</span>
-      </div>
-
-      <div class="news-meta">
-        <span id="newsPeriod">งวดที่ติดตาม —</span>
-        <span id="newsLastSync">ยังไม่มีข้อมูลอัปเดต</span>
-      </div>
-
-      <div class="news-layout">
-        <div class="news-trends">
-          <div class="news-trend-panel">
-            <div class="news-subhead"><strong>เลขท้าย 2 ตัวที่เป็นข่าว</strong><small>จากชุดเลขที่ระบุประเภทชัดเจน</small></div>
-            <div id="newsTop2" class="news-chips" aria-live="polite"><span class="news-empty">รอการรวบรวมข่าว</span></div>
-          </div>
-          <div class="news-trend-panel">
-            <div class="news-subhead"><strong>เลข 3 ตัวที่เป็นข่าว</strong><small>ไม่แปลงวันที่เป็นชุดเลข</small></div>
-            <div id="newsTop3" class="news-chips"><span class="news-empty">รอการรวบรวมข่าว</span></div>
-          </div>
-          <div id="newsOverlap" class="news-overlap" hidden></div>
-          <div class="news-disclaimer">ความนิยมของเลขในข่าว <b>ไม่ใช่ความน่าจะเป็นที่จะถูกรางวัล</b> ระบบจะแยกข่าวออกจาก Algorithm หลักจนกว่าจะมีหลักฐานจากการทดสอบย้อนหลังเพียงพอ</div>
-        </div>
-        <div class="news-source-panel">
-          <div class="news-subhead"><strong>สำนักที่รวบรวมได้</strong><small id="newsArticleCount">0 แหล่ง</small></div>
-          <div id="newsDiagnostics" class="news-diagnostics" hidden></div>
-          <div id="newsArticles" class="news-articles"><p class="news-empty">ยังไม่มีข่าวที่ผ่านเกณฑ์การแยกเลข</p></div>
-        </div>
-      </div>
-
-      <p class="news-disclaimer">ข้อมูลเลขดังรวบรวมจาก <a href="https://lotterychecks.com/lucky-picks" target="_blank" rel="noopener noreferrer">LotteryChecks</a> โดยแยกชุดเลขตามสำนักที่ระบุไว้ในต้นทาง ไม่ใช่ผลรางวัลทางการหรือคำรับประกันว่าจะออก</p>
-      <details class="news-audit-details">
-        <summary>ผลตรวจเลขดังจากข่าวย้อนหลัง</summary>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>งวดที่ตรวจ</th><th>เลข 2 ตัวจากข่าว</th><th>ผลจริง</th><th>ผลตรวจ 2 ตัว</th><th>ตรวจเลข 3 ตัว</th></tr></thead>
-            <tbody id="newsAuditHistory"><tr><td colspan="5">ยังไม่มี Snapshot ที่ตรวจผลแล้ว</td></tr></tbody>
-          </table>
-        </div>
-      </details>
-    </section>
-
-
-    <section class="section">
-      <div class="section-head responsive-head">
-        <div>
-          <span class="label">สถิติย้อนหลัง</span>
-          <h2>เลขออกมาก / ออกน้อย</h2>
-        </div>
-        <div id="rangeTabs" class="tabs">
-          <button data-range="10">10 งวด</button>
-          <button data-range="20">20 งวด</button>
-          <button class="active" data-range="50">50 งวด</button>
-          <button data-range="all">ทั้งหมด</button>
-        </div>
-      </div>
-
-      <div class="stats-grid">
-        <article class="card stat-card">
-          <span class="mini-title">ออกบ่อย</span>
-          <div id="hotNumbers" class="number-chips"></div>
-        </article>
-        <article class="card stat-card">
-          <span class="mini-title">ออกน้อย</span>
-          <div id="coldNumbers" class="number-chips"></div>
-        </article>
-        <article class="card stat-card chart-card">
-          <span class="mini-title">ความถี่ตัวเลข 0–9</span>
-          <div id="digitChart" class="digit-chart"></div>
-        </article>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="section-head">
-        <div>
-          <span class="label">ผลย้อนหลัง</span>
-          <h2>ข้อมูลที่ระบบมี <small id="historyCount" class="history-count"></small></h2>
-        </div>
-        <button id="reloadBtn" class="secondary-btn">↻ โหลดใหม่</button>
-      </div>
-      <div class="table-wrap card history-card">
-        <table>
-          <thead><tr><th>งวดวันที่</th><th>รางวัลที่ 1</th><th>เลขท้าย 2 ตัว</th></tr></thead>
-          <tbody id="historyBody"></tbody>
-        </table>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    <div class="container footer-inner">
-      <span>Lottery Insight · TheLegionZ</span>
-      <span>ผลทางการให้ยึดสำนักงานสลากกินแบ่งรัฐบาล · Data: <a href="https://lotterychecks.com/" target="_blank" rel="noreferrer">LotteryChecks</a></span>
-    </div>
-  </footer>
-
-
-  <div id="resultModal" class="result-modal-backdrop" hidden>
-    <div id="resultModalCard" class="result-modal-card" role="dialog" aria-modal="true" aria-labelledby="resultModalTitle">
-<div id="resultMotion" class="result-motion" aria-hidden="true"></div>
-      <div id="resultModalIcon" class="result-modal-icon">✓</div>
-      <span id="resultModalEyebrow" class="result-modal-eyebrow">ผลการตรวจรางวัล</span>
-      <h2 id="resultModalTitle">ผลการตรวจรางวัล</h2>
-      <p id="resultModalTicket" class="result-modal-ticket"></p>
-      <div id="resultModalBody" class="result-modal-body"></div>
-      <button id="resultModalOk" class="primary-btn result-modal-ok">ปิดหน้าต่าง</button>
-    </div>
-  </div>
-
-  <div id="toast" class="toast"></div>
-  <script src="config.js?v=5.3.2"></script>
-  <script src="script.js?v=5.3.2"></script>
+</p>
+</details></section><details class="system-diagnostics card"><summary>รายละเอียดสถานะระบบข่าว</summary><div class="news-diagnostics" hidden="" id="newsDiagnostics"></div><p>ตรวจสอบการเชื่อมต่อและสถานะการอัปเดตจากข้อมูลที่ระบบส่งกลับ</p></details></main>
+<footer>
+<div class="container footer-inner">
+<span>Lottery Insight · TheLegionZ</span>
+<span>ผลทางการให้ยึดสำนักงานสลากกินแบ่งรัฐบาล · Data: <a href="https://lotterychecks.com/" rel="noreferrer" target="_blank">LotteryChecks</a></span>
+<span class="site-version">UI v5.4.0</span></div>
+</footer>
+<div class="result-modal-backdrop" hidden="" id="resultModal">
+<div aria-labelledby="resultModalTitle" aria-modal="true" class="result-modal-card" id="resultModalCard" role="dialog">
+<div aria-hidden="true" class="result-motion" id="resultMotion"></div>
+<div class="result-modal-icon" id="resultModalIcon">✓</div>
+<span class="result-modal-eyebrow" id="resultModalEyebrow">ผลการตรวจรางวัล</span>
+<h2 id="resultModalTitle">ผลการตรวจรางวัล</h2>
+<p class="result-modal-ticket" id="resultModalTicket"></p>
+<div class="result-modal-body" id="resultModalBody"></div>
+<button class="primary-btn result-modal-ok" id="resultModalOk">ปิดหน้าต่าง</button>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+<script src="config.js?v=5.4.0"></script>
+<script src="script.js?v=5.4.0"></script>
 </body>
 </html>
